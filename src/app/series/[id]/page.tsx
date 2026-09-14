@@ -58,21 +58,13 @@ export default function SeriesDetailPage() {
   const totalEpisodes = Object.values(seasonProgressMap).reduce((a, b) => a + b.total, 0)
   const pct = totalEpisodes > 0 ? Math.round((totalWatched / totalEpisodes) * 100) : 0
 
-  // Load series detail + library check
+  // Load series detail
   useEffect(() => {
     if (!seriesId) return
     setLoading(true)
-    Promise.all([
-      getSeriesDetail(seriesId),
-      getLibrary().catch(() => [] as LibraryItem[]),
-    ])
-      .then(([data, lib]) => {
+    getSeriesDetail(seriesId)
+      .then((data) => {
         setSeries(data)
-        setInLibrary(
-          Array.isArray(lib)
-            ? lib.some((i: LibraryItem) => i.seriesId === seriesId || i.seriesId === `ser_${seriesId}`)
-            : false
-        )
         if (data.seasons && data.seasons.length > 0) {
           const firstReal = data.seasons.find((s) => s.seasonNumber > 0) || data.seasons[0]
           setSelectedSeason(firstReal.seasonNumber)
@@ -80,6 +72,14 @@ export default function SeriesDetailPage() {
       })
       .catch(() => {})
       .finally(() => setLoading(false))
+  }, [seriesId])
+
+  // Load library check separately (won't block page if 401)
+  useEffect(() => {
+    if (!seriesId) return
+    getLibrary()
+      .then((lib) => setInLibrary(Array.isArray(lib) ? lib.some((i: LibraryItem) => i.seriesId === seriesId || i.seriesId === `ser_${seriesId}`) : false))
+      .catch(() => setInLibrary(false))
   }, [seriesId])
 
   // Load all seasons to compute progress
