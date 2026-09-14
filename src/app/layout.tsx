@@ -1,8 +1,5 @@
 import type { Metadata } from "next"
-import { Provider } from "@/components/ui/provider"
-import { GoogleProvider } from "@/components/google-provider"
-import { AuthProvider } from "@/contexts/auth-context"
-import { Toaster } from "@/components/ui/toaster"
+import { ClientProviders } from "@/components/client-providers"
 
 export const metadata: Metadata = {
   title: "Episodic",
@@ -15,14 +12,7 @@ export default function RootLayout({
   return (
     <html lang="en" suppressHydrationWarning>
       <body>
-        <Provider>
-          <GoogleProvider>
-            <AuthProvider>
-              {children}
-              <Toaster />
-            </AuthProvider>
-          </GoogleProvider>
-        </Provider>
+        <ClientProviders>{children}</ClientProviders>
       </body>
     </html>
   )

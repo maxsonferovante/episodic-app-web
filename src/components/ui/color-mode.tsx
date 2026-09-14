@@ -2,17 +2,15 @@
 
 import type { IconButtonProps, SpanProps } from "@chakra-ui/react"
 import { ClientOnly, IconButton, Skeleton, Span } from "@chakra-ui/react"
-import { ThemeProvider, useTheme } from "next-themes"
-import type { ThemeProviderProps } from "next-themes"
 import * as React from "react"
 import { LuMoon, LuSun } from "react-icons/lu"
 
-export interface ColorModeProviderProps extends ThemeProviderProps {}
+export interface ColorModeProviderProps {
+  children?: React.ReactNode
+}
 
-export function ColorModeProvider(props: ColorModeProviderProps) {
-  return (
-    <ThemeProvider attribute="class" disableTransitionOnChange {...props} />
-  )
+export function ColorModeProvider({ children }: ColorModeProviderProps) {
+  return <>{children}</>
 }
 
 export type ColorMode = "light" | "dark"
@@ -24,16 +22,32 @@ export interface UseColorModeReturn {
 }
 
 export function useColorMode(): UseColorModeReturn {
-  const { resolvedTheme, setTheme, forcedTheme } = useTheme()
-  const colorMode = forcedTheme || resolvedTheme
-  const toggleColorMode = () => {
-    setTheme(resolvedTheme === "dark" ? "light" : "dark")
-  }
-  return {
-    colorMode: colorMode as ColorMode,
-    setColorMode: setTheme,
-    toggleColorMode,
-  }
+  const [colorMode, setColorModeState] = React.useState<ColorMode>("light")
+
+  React.useEffect(() => {
+    const stored = localStorage.getItem("chakra-ui-color-mode") as ColorMode | null
+    if (stored) {
+      setColorModeState(stored)
+      document.documentElement.classList.toggle("dark", stored === "dark")
+    } else {
+      const prefersDark = window.matchMedia("(prefers-color-scheme: dark)").matches
+      const mode = prefersDark ? "dark" : "light"
+      setColorModeState(mode)
+      document.documentElement.classList.toggle("dark", mode === "dark")
+    }
+  }, [])
+
+  const setColorMode = React.useCallback((mode: ColorMode) => {
+    setColorModeState(mode)
+    localStorage.setItem("chakra-ui-color-mode", mode)
+    document.documentElement.classList.toggle("dark", mode === "dark")
+  }, [])
+
+  const toggleColorMode = React.useCallback(() => {
+    setColorMode(colorMode === "dark" ? "light" : "dark")
+  }, [colorMode, setColorMode])
+
+  return { colorMode, setColorMode, toggleColorMode }
 }
 
 export function useColorModeValue<T>(light: T, dark: T) {
