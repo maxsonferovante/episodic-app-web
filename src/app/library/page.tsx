@@ -12,6 +12,7 @@ import {
   Badge,
   Center,
   Button,
+  Image,
 } from "@chakra-ui/react"
 import { ProtectedLayout } from "@/components/protected-layout"
 import { getLibrary, removeFromLibrary } from "@/lib/api"
@@ -35,6 +36,9 @@ export default function LibraryPage() {
     } catch {}
   }
 
+  const tmdbPoster = (path: string | null) =>
+    path ? `https://image.tmdb.org/t/p/w342${path}` : null
+
   return (
     <ProtectedLayout>
       <Container maxW="7xl" py={8} px={{ base: 4, md: 6 }}>
@@ -49,32 +53,50 @@ export default function LibraryPage() {
               <Text color="fg.muted">Your library is empty. Search for a series to get started.</Text>
             </Box>
           ) : (
-            <SimpleGrid columns={{ base: 1, sm: 2, md: 3, lg: 4 }} gap={4}>
+            <SimpleGrid columns={{ base: 2, sm: 3, md: 4, lg: 5 }} gap={4}>
               {items.map((item) => (
                 <Box
                   key={item.id}
-                  p={4}
                   rounded="lg"
                   borderWidth="1px"
                   borderColor="border.subtle"
+                  overflow="hidden"
                   _hover={{ shadow: "md" }}
                   transition="shadow"
                 >
-                  <Stack gap={2}>
-                    <Heading size="sm">Series {item.seriesId}</Heading>
-                    <Badge colorPalette="blue" size="sm">In Library</Badge>
-                    <Text fontSize="xs" color="fg.muted">
-                      Added {new Date(item.addedAt).toLocaleDateString()}
-                    </Text>
-                    <Button
-                      size="xs"
-                      colorPalette="red"
-                      variant="outline"
-                      onClick={() => handleRemove(item.seriesId)}
-                    >
-                      Remove
-                    </Button>
-                  </Stack>
+                  <Box aspectRatio={2/3} bg="bg.muted">
+                    {tmdbPoster(item.posterPath) ? (
+                      <Image
+                        src={tmdbPoster(item.posterPath)}
+                        alt={item.name}
+                        w="full"
+                        h="full"
+                        objectFit="cover"
+                      />
+                    ) : (
+                      <Center h="full">
+                        <Text fontSize="sm" color="fg.muted">No poster</Text>
+                      </Center>
+                    )}
+                  </Box>
+                  <Box p={3}>
+                    <Stack gap={1}>
+                      <Heading size="xs" noOfLines={2}>{item.name}</Heading>
+                      {item.firstAirDate && (
+                        <Text fontSize="xs" color="fg.muted">
+                          {item.firstAirDate.slice(0, 4)}
+                        </Text>
+                      )}
+                      <Button
+                        size="xs"
+                        colorPalette="red"
+                        variant="outline"
+                        onClick={() => handleRemove(item.seriesId)}
+                      >
+                        Remove
+                      </Button>
+                    </Stack>
+                  </Box>
                 </Box>
               ))}
             </SimpleGrid>

@@ -87,6 +87,10 @@ export interface SeriesDetailResponse extends SeriesDetail {
 export interface LibraryItem {
   id: string
   seriesId: string
+  tmdbId: number
+  name: string
+  posterPath: string | null
+  firstAirDate: string | null
   addedAt: string
 }
 
