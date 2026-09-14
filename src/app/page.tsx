@@ -20,7 +20,7 @@ import {
   Icon,
   Image,
 } from "@chakra-ui/react"
-import { FiPlus, FiSearch, FiPlay, FiChevronRight } from "react-icons/fi"
+import { FiPlus, FiSearch, FiChevronRight } from "react-icons/fi"
 import { ProtectedLayout } from "@/components/protected-layout"
 import { getDashboard } from "@/lib/api"
 import type { DashboardResponse } from "@/lib/types"
@@ -59,7 +59,7 @@ export default function DashboardPage() {
               align={{ base: "start", md: "center" }}
               justify="space-between"
               gap={6}
-              bg="bg.default"
+              bg="bg"
               p={{ base: 6, md: 8 }}
               rounded="3xl"
               borderWidth="1px"
@@ -77,7 +77,7 @@ export default function DashboardPage() {
 
               <Flex gap={3} wrap="wrap">
                 <Button
-                  colorPalette="green"
+                  colorPalette="gray"
                   rounded="full"
                   gap={1.5}
                   fontWeight="bold"
@@ -105,7 +105,7 @@ export default function DashboardPage() {
             {data?.continueWatching && data.continueWatching.length > 0 && (
               <Box>
                 <Flex align="center" gap={2} mb={4}>
-                  <Box w={1.5} h={3} bg="accent.default" rounded="full" />
+                  <Box w={1.5} h={3} bg="accent" rounded="full" />
                   <Heading size="sm" textTransform="uppercase" letterSpacing="wider" color="fg.muted">
                     Continue Watching ({data.continueWatching.length})
                   </Heading>
@@ -122,13 +122,13 @@ export default function DashboardPage() {
                         overflow="hidden"
                         borderWidth="1px"
                         borderColor="border.subtle"
-                        bg="bg.default"
+                        bg="bg"
                         position="relative"
                         _hover={{ shadow: "md" }}
                         transition="all"
                       >
                         {/* Top accent bar */}
-                        <Box h={1} w="full" bg="accent.default" />
+                        <Box h={1} w="full" bg="accent" />
 
                         {item.series.posterPath && (
                           <Image
@@ -154,6 +154,7 @@ export default function DashboardPage() {
                             value={item.progress.percentage}
                             size="sm"
                             mt={2}
+                            colorPalette="blue"
                           >
                             <Progress.Track>
                               <Progress.Range />
@@ -184,7 +185,7 @@ export default function DashboardPage() {
                       rounded="2xl"
                       borderWidth="1px"
                       borderColor="border.subtle"
-                      bg="bg.default"
+                      bg="bg"
                       position="relative"
                       overflow="hidden"
                       display="flex"
@@ -244,7 +245,7 @@ export default function DashboardPage() {
                       rounded="2xl"
                       borderWidth="1px"
                       borderColor="border.subtle"
-                      bg="bg.default"
+                      bg="bg"
                       display="flex"
                       alignItems="center"
                       gap={4}
@@ -284,7 +285,7 @@ export default function DashboardPage() {
                       Search for a series to get started
                     </Text>
                     <Button
-                      colorPalette="green"
+                      colorPalette="gray"
                       rounded="full"
                       gap={1.5}
                       onClick={() => router.push("/search")}

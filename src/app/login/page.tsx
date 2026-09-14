@@ -13,10 +13,9 @@ import {
   Icon,
   Flex,
   Grid,
-  Container,
   Badge,
 } from "@chakra-ui/react"
-import { GoogleLogin } from "@react-oauth/google"
+import { GoogleButton } from "@/components/google-button"
 import { useAuth } from "@/contexts/auth-context"
 import { FiTv, FiClock, FiBookOpen, FiStar, FiChevronDown } from "react-icons/fi"
 
@@ -82,35 +81,44 @@ export default function LoginPage() {
   if (isAuthenticated) return null
 
   return (
-    <Box minH="100vh" bg="bg.muted">
-      <Grid
-        templateColumns={{ base: "1fr", md: "1fr 1fr" }}
-        gap={10}
+    <Box minH="100vh" bg="bg.subtle">
+      <Flex
+        direction="column"
+        justify="center"
+        gap={{ base: 8, md: 10 }}
         maxW="5xl"
         mx="auto"
         px={{ base: 6, md: 10 }}
         py={{ base: 12, md: 16 }}
-        alignItems="center"
         minH="100vh"
       >
-        {/* Coluna Esquerda: Descrição */}
-        <VStack align="start" gap={6}>
-          <VStack align="start" gap={2}>
-            <Heading size="3xl" letterSpacing="tight">
-              Episodic
-            </Heading>
-            <Text color="fg.muted" fontSize="sm" fontWeight="medium">
-              Rastreie o progresso das suas séries de TV
-            </Text>
-          </VStack>
+        {/* Cabeçalho (acima das duas colunas) */}
+        <VStack align="start" gap={2}>
+          <Heading size="3xl" letterSpacing="tight">
+            Episodic
+          </Heading>
+          <Text color="fg.muted" fontSize="sm" fontWeight="medium">
+            Rastreie o progresso das suas séries de TV
+          </Text>
+        </VStack>
 
+        {/* Colunas de altura igual — os dois cards alinham topo e base */}
+        <Grid
+          templateColumns={{ base: "1fr", md: "1fr 1fr" }}
+          gap={{ base: 8, md: 10 }}
+          alignItems="stretch"
+        >
+          {/* Card de apresentação */}
           <Box
             p={6}
             rounded="2xl"
             borderWidth="1px"
             borderColor="border.subtle"
-            bg="bg.default/70"
+            bg="bg"
             shadow="sm"
+            h="full"
+            display="flex"
+            flexDirection="column"
           >
             <Text fontSize="sm" fontWeight="semibold" mb={3}>
               Seu catálogo pessoal de séries, organizado e sempre atualizado.
@@ -129,32 +137,26 @@ export default function LoginPage() {
               ))}
             </VStack>
 
-            <Box mt={4} borderTopWidth="1px" borderColor="border.subtle" pt={3}>
+            <Box mt="auto" pt={4} borderTopWidth="1px" borderColor="border.subtle">
               {faqItems.map((item) => (
                 <FaqItem key={item.q} {...item} />
               ))}
             </Box>
           </Box>
 
-          <Badge colorPalette="green" variant="subtle" fontSize="xs">
-            ✓ Biblioteca ilimitada · Progresso automático
-          </Badge>
-        </VStack>
-
-        {/* Coluna Direita: Card de Login */}
-        <Center>
-          <Box
-            bg="bg.default"
+          {/* Card de login */}
+          <Flex
+            bg="bg"
             rounded="3xl"
             shadow="lg"
             borderWidth="1px"
             borderColor="border.subtle"
-            w="full"
-            maxW="sm"
             overflow="hidden"
+            direction="column"
+            h="full"
           >
-            <Box h={1.5} w="full" bg="accent.default" />
-            <VStack p={8} gap={6}>
+            <Box h={1.5} w="full" bg="accent" />
+            <VStack flex={1} justify="center" p={8} gap={6}>
               <Center
                 w={14}
                 h={14}
@@ -171,13 +173,11 @@ export default function LoginPage() {
                 </Text>
               </VStack>
               <Box w="full">
-                <GoogleLogin
-                  onSuccess={(credentialResponse) => {
-                    if (credentialResponse.credential) {
-                      login(credentialResponse.credential).then(() => {
-                        router.push("/")
-                      })
-                    }
+                <GoogleButton
+                  onSuccess={(credential) => {
+                    login(credential).then(() => {
+                      router.push("/")
+                    })
                   }}
                   onError={() => {
                     console.error("Google login failed")
@@ -188,9 +188,21 @@ export default function LoginPage() {
                 Episodic
               </Text>
             </VStack>
-          </Box>
-        </Center>
-      </Grid>
+          </Flex>
+
+          {/* Badge sob a coluna esquerda */}
+          <Badge
+            gridColumn={{ md: "1" }}
+            justifySelf="flex-start"
+            alignSelf="start"
+            colorPalette="green"
+            variant="subtle"
+            fontSize="xs"
+          >
+            ✓ Biblioteca ilimitada · Progresso automático
+          </Badge>
+        </Grid>
+      </Flex>
     </Box>
   )
 }

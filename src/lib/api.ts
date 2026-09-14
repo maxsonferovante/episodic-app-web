@@ -4,6 +4,7 @@ import type {
   SearchResponse,
   SeriesDetailResponse,
   SeasonDetail,
+  Episode,
   LibraryResponse,
   LibraryItem,
   DashboardResponse,
@@ -138,11 +139,48 @@ export async function getSeriesDetail(
   return request(`/api/v1/series/${seriesId}`)
 }
 
+/**
+ * The catalog lambda serialises episodes with snake_case keys while the rest
+ * of the API uses camelCase. Normalise defensively so the UI keeps working
+ * regardless of which casing the backend returns.
+ */
+function normalizeEpisode(raw: Record<string, unknown>): Episode {
+  const pick = <T>(...keys: string[]): T | undefined => {
+    for (const key of keys) {
+      if (raw[key] !== undefined && raw[key] !== null) return raw[key] as T
+    }
+    return undefined
+  }
+
+  return {
+    id: String(pick("id") ?? ""),
+    seriesId: String(pick("seriesId", "series_id") ?? ""),
+    seasonId: String(pick("seasonId", "season_id") ?? ""),
+    tmdbId: Number(pick("tmdbId", "tmdb_id") ?? 0),
+    episodeNumber: Number(pick("episodeNumber", "episode_number") ?? 0),
+    name: String(pick("name") ?? ""),
+    overview: String(pick("overview") ?? ""),
+    stillPath: (pick<string | null>("stillPath", "still_path") ?? null) as string | null,
+    airDate: (pick<string | null>("airDate", "air_date") ?? null) as string | null,
+    runtime: (pick<number | null>("runtime") ?? null) as number | null,
+    voteAverage: (pick<number | null>("voteAverage", "vote_average") ?? null) as number | null,
+    status: pick<Episode["status"]>("status"),
+  }
+}
+
 export async function getSeasonDetail(
   seriesId: string,
   seasonNumber: number,
 ): Promise<SeasonDetail> {
-  return request(`/api/v1/series/${seriesId}/seasons/${seasonNumber}`)
+  const data = await request<SeasonDetail>(
+    `/api/v1/series/${seriesId}/seasons/${seasonNumber}`,
+  )
+  const rawEpisodes = (data.episodes ?? []) as unknown as Record<string, unknown>[]
+  return {
+    ...data,
+    seasonNumber: data.seasonNumber ?? seasonNumber,
+    episodes: rawEpisodes.map(normalizeEpisode),
+  }
 }
 
 export async function getLibrary(): Promise<LibraryResponse> {

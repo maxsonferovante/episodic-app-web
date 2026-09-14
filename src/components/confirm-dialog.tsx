@@ -4,9 +4,8 @@ import {
   Dialog,
   Portal,
   Button,
-  Text,
   VStack,
-  HStack,
+  Flex,
   Icon,
 } from "@chakra-ui/react"
 import { FiAlertTriangle } from "react-icons/fi"
@@ -21,6 +20,11 @@ interface ConfirmDialogProps {
   colorPalette?: string
 }
 
+/**
+ * Confirmation modal — mirrors the Alpaca APP `DeletePhotoDialog`:
+ * a circled warning glyph, a short question, a supporting sentence and a
+ * two-column action row (cancel / confirm).
+ */
 export function ConfirmDialog({
   open,
   onOpenChange,
@@ -36,40 +40,55 @@ export function ConfirmDialog({
       onOpenChange={(details) => onOpenChange(details.open)}
     >
       <Portal>
-        <Dialog.Backdrop />
+        <Dialog.Backdrop backdropBlur="sm" bg="black/20" />
         <Dialog.Positioner>
-          <Dialog.Content rounded="2xl" maxW="sm" mx={4}>
-            <Dialog.Header>
-              <VStack gap={2} align="start">
-                <HStack gap={2}>
-                  <Icon
-                    as={FiAlertTriangle}
-                    color="fg.error"
-                    boxSize={5}
-                  />
-                  <Dialog.Title fontSize="lg">{title}</Dialog.Title>
-                </HStack>
-              </VStack>
-            </Dialog.Header>
-            <Dialog.Body>
-              <Text color="fg.muted" fontSize="sm">
-                {description}
-              </Text>
-            </Dialog.Body>
-            <Dialog.Footer gap={2}>
-              <Dialog.ActionTrigger asChild>
-                <Button variant="outline" flex={1}>
-                  Cancel
-                </Button>
-              </Dialog.ActionTrigger>
-              <Button
-                colorPalette={colorPalette as "red"}
-                onClick={onConfirm}
-                flex={1}
+          <Dialog.Content
+            rounded="2xl"
+            maxW="md"
+            mx={4}
+            p={6}
+            shadow="modal"
+            borderWidth="1px"
+            borderColor="border.subtle"
+          >
+            <VStack gap={3} textAlign="center">
+              <Flex
+                w={12}
+                h={12}
+                rounded="full"
+                bg="bg.error"
+                color="fg.error"
+                align="center"
+                justify="center"
               >
-                {confirmLabel}
-              </Button>
-            </Dialog.Footer>
+                <Icon as={FiAlertTriangle} boxSize={6} />
+              </Flex>
+
+              <Dialog.Title fontSize="lg" fontWeight="bold" color="fg">
+                {title}
+              </Dialog.Title>
+
+              <Dialog.Description fontSize="sm" color="fg.muted">
+                {description}
+              </Dialog.Description>
+
+              <Flex gap={3} w="full" pt={2}>
+                <Dialog.ActionTrigger asChild>
+                  <Button variant="outline" flex={1} rounded="full" borderColor="border.subtle">
+                    Cancel
+                  </Button>
+                </Dialog.ActionTrigger>
+                <Button
+                  colorPalette={colorPalette as "red"}
+                  onClick={onConfirm}
+                  flex={1}
+                  rounded="full"
+                  fontWeight="semibold"
+                >
+                  {confirmLabel}
+                </Button>
+              </Flex>
+            </VStack>
           </Dialog.Content>
         </Dialog.Positioner>
       </Portal>

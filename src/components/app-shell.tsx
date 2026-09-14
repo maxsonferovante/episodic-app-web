@@ -1,6 +1,6 @@
 "use client"
 
-import { usePathname } from "next/navigation"
+import { usePathname, useRouter } from "next/navigation"
 import Link from "next/link"
 import {
   Box,
@@ -14,6 +14,7 @@ import {
 import { FiSearch, FiBookOpen, FiClock, FiHome, FiMenu, FiX } from "react-icons/fi"
 import { useState } from "react"
 import { UserMenu } from "@/components/user-menu"
+import { ProfileDialog } from "@/components/profile-dialog"
 
 const navLinks = [
   { href: "/", label: "Home", icon: FiHome },
@@ -24,12 +25,14 @@ const navLinks = [
 
 export function AppShell({ children }: { children: React.ReactNode }) {
   const pathname = usePathname()
+  const router = useRouter()
   const isMobile = useBreakpointValue({ base: true, md: false })
   const [mobileOpen, setMobileOpen] = useState(false)
+  const [profileOpen, setProfileOpen] = useState(false)
 
   return (
-    <Flex direction="column" minH="100vh">
-      {/* Navbar com backdrop-blur e accent bar */}
+    <Flex direction="column" minH="100vh" bg="bg.subtle">
+      {/* Navbar — sticky, translucent, hairline border (Vercel header) */}
       <Box
         as="nav"
         position="sticky"
@@ -41,10 +44,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
         {/* Accent bar */}
         <Box h={1} w="full" bg="accent.subtle" />
 
-        <Box
-          bg="bg.default/80"
-          backdropBlur="md"
-        >
+        <Box bg="bg.subtle/80" backdropBlur="md">
           <Flex
             maxW="7xl"
             mx="auto"
@@ -67,24 +67,18 @@ export function AppShell({ children }: { children: React.ReactNode }) {
               )}
               <Link href="/" style={{ textDecoration: "none" }}>
                 <HStack gap={2}>
-                  <Box
+                  <Flex
                     bg="accent.subtle"
                     color="fg.accent"
                     p={1.5}
                     rounded="lg"
-                    display="flex"
-                    alignItems="center"
-                    justifyContent="center"
+                    align="center"
+                    justify="center"
                     shadow="xs"
                   >
                     <Icon as={FiHome} boxSize={4} />
-                  </Box>
-                  <Text
-                    fontSize="lg"
-                    fontWeight="bold"
-                    color="fg.default"
-                    letterSpacing="tight"
-                  >
+                  </Flex>
+                  <Text fontSize="lg" fontWeight="bold" color="fg" letterSpacing="tight">
                     Episodic
                   </Text>
                 </HStack>
@@ -95,22 +89,26 @@ export function AppShell({ children }: { children: React.ReactNode }) {
             {!isMobile && (
               <HStack gap={1}>
                 {navLinks.map((link) => {
-                  const Icon = link.icon
+                  const NavIcon = link.icon
                   const isActive = pathname === link.href
                   return (
-                    <Link key={link.href} href={link.href} style={{ textDecoration: "none" }}>
+                    <Link
+                      key={link.href}
+                      href={link.href}
+                      style={{ textDecoration: "none" }}
+                    >
                       <HStack
                         gap={2}
                         px={3}
                         py={2}
                         rounded="md"
-                        color={isActive ? "fg.default" : "fg.muted"}
+                        color={isActive ? "fg" : "fg.muted"}
                         bg={isActive ? "bg.muted" : "transparent"}
-                        _hover={{ bg: "bg.muted" }}
+                        _hover={{ bg: "bg.muted", color: "fg" }}
                         transition="backgrounds"
                       >
-                        <Icon size={16} />
-                        <Text fontSize="sm" fontWeight={isActive ? "medium" : "normal"}>
+                        <NavIcon size={16} />
+                        <Text fontSize="sm" fontWeight={isActive ? "semibold" : "normal"}>
                           {link.label}
                         </Text>
                       </HStack>
@@ -121,15 +119,21 @@ export function AppShell({ children }: { children: React.ReactNode }) {
             )}
 
             {/* User Menu */}
-            <UserMenu />
+            <UserMenu onOpenProfile={() => setProfileOpen(true)} />
           </Flex>
         </Box>
 
         {/* Mobile Menu */}
         {isMobile && mobileOpen && (
-          <Box borderTopWidth="1px" borderColor="border.subtle" px={4} pb={4}>
+          <Box
+            borderTopWidth="1px"
+            borderColor="border.subtle"
+            bg="bg.subtle"
+            px={4}
+            py={3}
+          >
             {navLinks.map((link) => {
-              const Icon = link.icon
+              const NavIcon = link.icon
               const isActive = pathname === link.href
               return (
                 <Link
@@ -143,12 +147,12 @@ export function AppShell({ children }: { children: React.ReactNode }) {
                     px={3}
                     py={3}
                     rounded="md"
-                    color={isActive ? "fg.default" : "fg.muted"}
+                    color={isActive ? "fg" : "fg.muted"}
                     bg={isActive ? "bg.muted" : "transparent"}
-                    _hover={{ bg: "bg.muted" }}
+                    _hover={{ bg: "bg.muted", color: "fg" }}
                   >
-                    <Icon size={18} />
-                    <Text fontSize="sm" fontWeight={isActive ? "medium" : "normal"}>
+                    <NavIcon size={18} />
+                    <Text fontSize="sm" fontWeight={isActive ? "semibold" : "normal"}>
                       {link.label}
                     </Text>
                   </HStack>
@@ -175,6 +179,12 @@ export function AppShell({ children }: { children: React.ReactNode }) {
           Episodic
         </Text>
       </Box>
+
+      <ProfileDialog
+        open={profileOpen}
+        onOpenChange={setProfileOpen}
+        onOpenLibrary={() => router.push("/library")}
+      />
     </Flex>
   )
 }

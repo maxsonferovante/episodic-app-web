@@ -16,7 +16,6 @@ import {
   Flex,
   Progress,
   Icon,
-  Tabs,
 } from "@chakra-ui/react"
 import { FiCheck, FiPlus, FiPlay, FiClock, FiCalendar, FiFilm, FiChevronRight, FiTrendingUp } from "react-icons/fi"
 import { ProtectedLayout } from "@/components/protected-layout"
@@ -158,7 +157,9 @@ export default function SeriesDetailPage() {
   )
 
   const handleEpisodeClick = (episode: Episode) => {
-    router.push(`/series/${seriesId}/episodes/${episode.id}`)
+    // The catalog lambda regenerates episode ids on every request, so we route
+    // with a stable season/episode slug instead of the volatile id.
+    router.push(`/series/${seriesId}/episodes/${selectedSeason}-${episode.episodeNumber}`)
   }
 
   return (
@@ -230,7 +231,7 @@ export default function SeriesDetailPage() {
             </Box>
 
             {/* Overall Progress */}
-            <Box p={5} rounded="2xl" borderWidth="1px" borderColor="border.subtle" bg="bg.default" shadow="sm">
+            <Box p={5} rounded="2xl" borderWidth="1px" borderColor="border.subtle" bg="bg" shadow="sm">
               <Stack gap={3}>
                 <Flex justifyContent="space-between" alignItems="center">
                   <Flex gap={2} alignItems="center">
@@ -241,13 +242,15 @@ export default function SeriesDetailPage() {
                   </Flex>
                   <Button
                     size="sm"
-                    colorPalette={inLibrary ? "red" : "blue"}
-                    variant={inLibrary ? "surface" : "solid"}
+                    rounded="full"
+                    colorPalette={inLibrary ? "green" : "gray"}
+                    variant={inLibrary ? "subtle" : "solid"}
+                    fontWeight="semibold"
                     onClick={handleToggleLibrary}
                     loading={actionLoading}
                   >
                     <Icon as={inLibrary ? FiCheck : FiPlus} />
-                    {inLibrary ? "Na Biblioteca" : "Adicionar"}
+                    {inLibrary ? "Na Biblioteca" : "Adicionar à Biblioteca"}
                   </Button>
                 </Flex>
                 <Progress.Root value={pct} size="sm" rounded="full">
@@ -288,28 +291,57 @@ export default function SeriesDetailPage() {
             {/* Season Tabs */}
             {series.seasons && series.seasons.length > 0 && (
               <Box>
-                <Tabs.Root value={String(selectedSeason)} onValueChange={(e) => setSelectedSeason(Number(e.value))}>
-                  <Tabs.List overflowX="auto" whiteSpace="nowrap" gap={2} pb={1}>
-                    {series.seasons.map((s) => {
-                      const isActive = s.seasonNumber === selectedSeason
-                      const prog = seasonProgressMap[s.seasonNumber]
-                      const seasonPct = prog ? Math.round((prog.watched / Math.max(prog.total, 1)) * 100) : 0
-                      return (
-                        <Box key={s.id} flexShrink={0}>
-                          <Tabs.Trigger value={String(s.seasonNumber)} asChild>
-                            <Button size="sm" variant={isActive ? "solid" : "ghost"} colorPalette="gray" whiteSpace="nowrap">
-                              {s.seasonNumber === 0 ? "Extras" : `T${s.seasonNumber}`}
-                              {prog && prog.total > 0 && (
-                                <Badge size="xs" colorPalette={seasonPct === 100 ? "green" : "gray"} ml={1}>
-                                  {prog.watched}/{prog.total}
-                                </Badge>
-                              )}
-                            </Button>
-                          </Tabs.Trigger>
-                        </Box>
-                      )
-                    })}
-                  </Tabs.List>
+                {/* Segmented control de temporadas */}
+                <Box
+                  role="tablist"
+                  aria-label="Temporadas"
+                  display="flex"
+                  gap={1}
+                  p={1.5}
+                  bg="bg.muted"
+                  rounded="full"
+                  borderWidth="1px"
+                  borderColor="border.subtle"
+                  overflowX="auto"
+                  css={{ scrollbarWidth: "none", "&::-webkit-scrollbar": { display: "none" } }}
+                >
+                  {series.seasons.map((s) => {
+                    const isActive = s.seasonNumber === selectedSeason
+                    const prog = seasonProgressMap[s.seasonNumber]
+                    const seasonPct = prog ? Math.round((prog.watched / Math.max(prog.total, 1)) * 100) : 0
+                    return (
+                      <Button
+                        key={s.id}
+                        role="tab"
+                        aria-selected={isActive}
+                        size="sm"
+                        flexShrink={0}
+                        rounded="full"
+                        px={4}
+                        fontWeight="semibold"
+                        variant={isActive ? "outline" : "ghost"}
+                        bg={isActive ? "bg" : undefined}
+                        color={isActive ? "fg" : "fg.muted"}
+                        borderColor="border.subtle"
+                        shadow={isActive ? "xs" : "none"}
+                        _hover={{ color: "fg" }}
+                        onClick={() => setSelectedSeason(s.seasonNumber)}
+                      >
+                        {s.seasonNumber === 0 ? "Extras" : `T${s.seasonNumber}`}
+                        {prog && prog.total > 0 && (
+                          <Text
+                            as="span"
+                            fontSize="xs"
+                            fontFamily="mono"
+                            color={seasonPct === 100 ? "fg.success" : isActive ? "fg.muted" : "fg.subtle"}
+                          >
+                            {prog.watched}/{prog.total}
+                          </Text>
+                        )}
+                      </Button>
+                    )
+                  })}
+                </Box>
 
                   {/* Season Progress Bar */}
                   {seasonProgressMap[selectedSeason] && (
@@ -353,7 +385,7 @@ export default function SeriesDetailPage() {
                             rounded="lg"
                             borderWidth="1px"
                             borderColor={isWatched ? "green.200" : "border.subtle"}
-                            bg={isWatched ? "green.50" : "bg.default"}
+                            bg={isWatched ? "green.50" : "bg"}
                             _hover={{ shadow: "sm" }}
                             transition="all"
                             cursor="pointer"
@@ -450,7 +482,6 @@ export default function SeriesDetailPage() {
                       <Text color="fg.muted">Nenhum episódio disponível</Text>
                     </Center>
                   )}
-                </Tabs.Root>
               </Box>
             )}
           </Stack>

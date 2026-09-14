@@ -24,6 +24,11 @@ interface UserMenuProps {
   onOpenProfile?: () => void
 }
 
+/**
+ * User context menu anchored to the avatar — same disposition as the
+ * Alpaca APP `UserMenuDropdown`: identity header, navigation items,
+ * a separator and a destructive logout.
+ */
 export function UserMenu({ onOpenProfile }: UserMenuProps) {
   const { user, logout } = useAuth()
   const initials = user?.name
@@ -42,73 +47,85 @@ export function UserMenu({ onOpenProfile }: UserMenuProps) {
           as="button"
           align="center"
           gap={1.5}
-          px={2}
-          py={1}
+          p={1}
           rounded="full"
-          _hover={{ bg: "bg.muted" }}
-          transition="backgrounds"
+          borderWidth="1px"
+          borderColor="transparent"
+          cursor="pointer"
+          _hover={{ bg: "bg.muted", borderColor: "border.subtle" }}
+          transition="backgrounds, border-color"
         >
           <Avatar.Root size="sm">
-            {user?.name ? (
-              <Avatar.Fallback name={user.name} />
-            ) : (
-              <Avatar.Fallback>{initials}</Avatar.Fallback>
-            )}
+            <Avatar.Fallback name={user?.name} bg="bg.muted" fontWeight="bold">
+              {initials}
+            </Avatar.Fallback>
           </Avatar.Root>
           <Icon as={FiChevronDown} boxSize={3.5} color="fg.muted" />
         </Flex>
       </Menu.Trigger>
       <Portal>
-        <Menu.Content rounded="2xl" w={56} p={1.5}>
+        <Menu.Content
+          rounded="2xl"
+          w={60}
+          p={1.5}
+          shadow="menu"
+          borderWidth="1px"
+          borderColor="border.subtle"
+          bg="bg.panel"
+        >
           {/* Header */}
-          <Box px={3} py={2} borderBottomWidth="1px" borderColor="border.subtle" mb={1}>
-            <Text fontSize="sm" fontWeight="bold" truncate>
+          <Box
+            px={3}
+            py={2}
+            borderBottomWidth="1px"
+            borderColor="border.subtle"
+            mb={1}
+          >
+            <Text fontSize="sm" fontWeight="bold" color="fg" truncate>
               {user?.name}
             </Text>
-            <Text fontSize="xs" color="fg.muted" truncate>
+            <Text fontSize="xs" color="fg.muted" fontFamily="mono" truncate>
               {user?.email}
             </Text>
           </Box>
 
           {/* My Profile */}
           {onOpenProfile && (
-            <Menu.Item
-              value="profile"
-              gap={2.5}
-              onClick={onOpenProfile}
-            >
+            <Menu.Item value="profile" gap={2.5} rounded="lg" onClick={onOpenProfile}>
               <Icon as={FiUser} color="fg.accent" />
               <Text fontSize="sm">My Profile</Text>
             </Menu.Item>
           )}
 
           {/* Library */}
-          <Link href="/library" style={{ textDecoration: "none" }}>
-            <Menu.Item value="library" gap={2.5}>
+          <Menu.Item value="library" gap={2.5} rounded="lg" asChild>
+            <Link href="/library" style={{ textDecoration: "none" }}>
               <Icon as={FiBookOpen} color="fg.accent" />
               <Text fontSize="sm">My Library</Text>
-            </Menu.Item>
-          </Link>
+            </Link>
+          </Menu.Item>
 
           {/* Privacy */}
-          <Menu.Item value="privacy" gap={2.5}>
+          <Menu.Item value="privacy" gap={2.5} rounded="lg">
             <Icon as={FiShield} color="fg.accent" />
             <Text fontSize="sm">Privacy Policy</Text>
           </Menu.Item>
 
           {/* Terms */}
-          <Menu.Item value="terms" gap={2.5}>
+          <Menu.Item value="terms" gap={2.5} rounded="lg">
             <Icon as={FiFileText} color="fg.accent" />
             <Text fontSize="sm">Terms of Use</Text>
           </Menu.Item>
 
-          <Menu.Separator />
+          <Menu.Separator borderColor="border.subtle" />
 
           {/* Logout */}
           <Menu.Item
             value="logout"
             color="fg.error"
             gap={2.5}
+            rounded="lg"
+            _hover={{ bg: "bg.error" }}
             onClick={logout}
           >
             <Icon as={FiLogOut} />

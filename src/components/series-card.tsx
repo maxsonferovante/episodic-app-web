@@ -6,7 +6,6 @@ import {
   Flex,
   Text,
   Image,
-  Stack,
   Button,
   Icon,
 } from "@chakra-ui/react"
@@ -32,7 +31,7 @@ export function SeriesCard({
   name,
   posterPath,
   firstAirDate,
-  accent = "accent.default",
+  accent = "accent",
   footerLeft,
   footerRight,
   onAdd,
@@ -44,10 +43,10 @@ export function SeriesCard({
       rounded="2xl"
       borderWidth="1px"
       borderColor="border.subtle"
-      bg="bg.default"
+      bg="bg"
       overflow="hidden"
       position="relative"
-      _hover={{ shadow: "md" }}
+      _hover={{ shadow: "md", borderColor: "border.emphasized" }}
       transition="all"
       display="flex"
       flexDirection="column"
@@ -79,7 +78,7 @@ export function SeriesCard({
 
       {/* Card body */}
       <Box p={3} flex={1} display="flex" flexDirection="column" gap={2}>
-        <Text fontWeight="semibold" fontSize="sm" truncate>
+        <Text fontWeight="semibold" fontSize="sm" color="fg" truncate>
           {name}
         </Text>
         {firstAirDate && (
@@ -92,8 +91,9 @@ export function SeriesCard({
         {onAdd && (
           <Button
             size="xs"
-            colorPalette="green"
-            variant="outline"
+            colorPalette="gray"
+            rounded="full"
+            fontWeight="semibold"
             onClick={(e) => {
               e.preventDefault()
               e.stopPropagation()
@@ -109,7 +109,8 @@ export function SeriesCard({
           <Button
             size="xs"
             colorPalette="red"
-            variant="outline"
+            variant="subtle"
+            rounded="full"
             onClick={(e) => {
               e.preventDefault()
               e.stopPropagation()

@@ -55,25 +55,44 @@ export default function EpisodeDetailPage() {
   const [prevEpisode, setPrevEpisode] = useState<Episode | null>(null)
   const [nextEpisode, setNextEpisode] = useState<Episode | null>(null)
 
-  // Load series and find episode
+  // Load series and resolve the episode. The URL param is either a stable
+  // `{season}-{episode}` slug (preferred) or a legacy backend episode id.
   useEffect(() => {
     if (!seriesId || !episodeId) return
+    const slug = /^(\d+)-(\d+)$/.exec(episodeId)
     setLoading(true)
+
     getSeriesDetail(seriesId)
       .then(async (data) => {
         setSeries(data)
-        // Find which season contains this episode
         const realSeasons = data.seasons?.filter((s) => s.seasonNumber > 0) ?? []
+
+        const applyFound = (eps: Episode[], seasonNo: number, idx: number) => {
+          setEpisode(eps[idx])
+          setSeasonNumber(seasonNo)
+          setPrevEpisode(idx > 0 ? eps[idx - 1] : null)
+          setNextEpisode(idx < eps.length - 1 ? eps[idx + 1] : null)
+        }
+
+        // New format: fetch only the target season.
+        if (slug) {
+          const seasonNo = Number(slug[1])
+          const episodeNo = Number(slug[2])
+          const seasonData = await getSeasonDetail(seriesId, seasonNo).catch(() => null)
+          if (seasonData) {
+            const idx = seasonData.episodes.findIndex((ep) => ep.episodeNumber === episodeNo)
+            if (idx >= 0) applyFound(seasonData.episodes, seasonNo, idx)
+          }
+          return
+        }
+
+        // Legacy format: scan seasons for the volatile backend id.
         for (const season of realSeasons) {
-          const seasonData = await getSeasonDetail(seriesId, season.seasonNumber)
-          const found = seasonData.episodes.find((ep) => ep.id === episodeId)
-          if (found) {
-            setEpisode(found)
-            setSeasonNumber(season.seasonNumber)
-            // Find prev/next episodes
-            const idx = seasonData.episodes.findIndex((ep) => ep.id === episodeId)
-            setPrevEpisode(idx > 0 ? seasonData.episodes[idx - 1] : null)
-            setNextEpisode(idx < seasonData.episodes.length - 1 ? seasonData.episodes[idx + 1] : null)
+          const seasonData = await getSeasonDetail(seriesId, season.seasonNumber).catch(() => null)
+          if (!seasonData) continue
+          const idx = seasonData.episodes.findIndex((ep) => ep.id === episodeId)
+          if (idx >= 0) {
+            applyFound(seasonData.episodes, season.seasonNumber, idx)
             break
           }
         }
@@ -82,26 +101,28 @@ export default function EpisodeDetailPage() {
       .finally(() => setLoading(false))
   }, [seriesId, episodeId])
 
+  const episodeDbId = episode?.id
+
   // Load episode progress
   useEffect(() => {
-    if (!episodeId) return
-    getEpisodeProgress(episodeId)
+    if (!episodeDbId) return
+    getEpisodeProgress(episodeDbId)
       .then(setProgress)
       .catch(() => {})
-  }, [episodeId])
+  }, [episodeDbId])
 
   const handleToggleWatched = useCallback(async () => {
-    if (!episodeId) return
+    if (!episodeDbId) return
     setActionLoading(true)
     const newStatus = progress?.status === "WATCHED" ? "UNWATCHED" : "WATCHED"
     try {
-      await setEpisodeProgress(episodeId, newStatus)
-      setProgress((prev) => (prev ? { ...prev, status: newStatus } : { episodeId, status: newStatus, watchedAt: new Date().toISOString() }))
+      await setEpisodeProgress(episodeDbId, newStatus)
+      setProgress((prev) => (prev ? { ...prev, status: newStatus } : { episodeId: episodeDbId, status: newStatus, watchedAt: new Date().toISOString() }))
     } catch {}
     finally {
       setActionLoading(false)
     }
-  }, [episodeId, progress])
+  }, [episodeDbId, progress])
 
   const isWatched = progress?.status === "WATCHED"
   const watchedAt = progress?.watchedAt
@@ -210,7 +231,7 @@ export default function EpisodeDetailPage() {
             </Box>
 
             {/* Watched Status Card */}
-            <Box p={5} rounded="2xl" borderWidth="1px" borderColor={isWatched ? "green.200" : "border.subtle"} bg={isWatched ? "green.50" : "bg.default"} shadow="sm">
+            <Box p={5} rounded="2xl" borderWidth="1px" borderColor={isWatched ? "green.200" : "border.subtle"} bg={isWatched ? "green.50" : "bg"} shadow="sm">
               <Stack gap={3}>
                 <Flex justifyContent="space-between" alignItems="center">
                   <Flex gap={2} alignItems="center">
@@ -280,7 +301,7 @@ export default function EpisodeDetailPage() {
                 <Button
                   flex={1}
                   variant="outline"
-                  onClick={() => router.push(`/series/${seriesId}/episodes/${prevEpisode.id}`)}
+                  onClick={() => router.push(`/series/${seriesId}/episodes/${seasonNumber}-${prevEpisode.episodeNumber}`)}
                   gap={2}
                   justifyContent="flex-start"
                 >
@@ -300,7 +321,7 @@ export default function EpisodeDetailPage() {
                 <Button
                   flex={1}
                   variant="outline"
-                  onClick={() => router.push(`/series/${seriesId}/episodes/${nextEpisode.id}`)}
+                  onClick={() => router.push(`/series/${seriesId}/episodes/${seasonNumber}-${nextEpisode.episodeNumber}`)}
                   gap={2}
                   justifyContent="flex-end"
                 >
