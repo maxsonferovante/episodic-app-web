@@ -1,6 +1,7 @@
 "use client"
 
 import { useEffect, useState } from "react"
+import Link from "next/link"
 import {
   Box,
   Container,
@@ -10,7 +11,9 @@ import {
   Stack,
   Text,
   Center,
+  IconButton,
 } from "@chakra-ui/react"
+import { FiTrash2 } from "react-icons/fi"
 import { ProtectedLayout } from "@/components/protected-layout"
 import { SeriesCard } from "@/components/series-card"
 import { ConfirmDialog } from "@/components/confirm-dialog"
@@ -56,15 +59,32 @@ export default function LibraryPage() {
           ) : (
             <SimpleGrid columns={{ base: 2, sm: 3, md: 4, lg: 5 }} gap={4}>
               {items.map((item) => (
-                <SeriesCard
-                  key={item.id}
-                  id={item.seriesId}
-                  name={item.name}
-                  posterPath={item.posterPath}
-                  firstAirDate={item.firstAirDate}
-                  variant="library"
-                  onRemove={() => setRemoveTarget(item.seriesId)}
-                />
+                <Box key={item.id} position="relative">
+                  <Link href={`/series/${item.tmdbId}`} style={{ textDecoration: "none" }}>
+                    <SeriesCard
+                      id={String(item.tmdbId)}
+                      name={item.name}
+                      posterPath={item.posterPath}
+                      firstAirDate={item.firstAirDate}
+                    />
+                  </Link>
+                  <IconButton
+                    position="absolute"
+                    top={2}
+                    right={2}
+                    size="xs"
+                    colorPalette="red"
+                    variant="solid"
+                    zIndex={10}
+                    onClick={(e) => {
+                      e.preventDefault()
+                      e.stopPropagation()
+                      setRemoveTarget(item.seriesId)
+                    }}
+                  >
+                    <FiTrash2 />
+                  </IconButton>
+                </Box>
               ))}
             </SimpleGrid>
           )}
