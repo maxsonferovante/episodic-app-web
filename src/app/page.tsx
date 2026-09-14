@@ -2,20 +2,25 @@
 
 import { useEffect, useState } from "react"
 import Link from "next/link"
+import { useRouter } from "next/navigation"
 import {
   Box,
   Container,
   Heading,
   Text,
   SimpleGrid,
-  Image,
   Stack,
   Badge,
   Progress,
   Spinner,
   Center,
   VStack,
+  Flex,
+  Button,
+  Icon,
+  Image,
 } from "@chakra-ui/react"
+import { FiPlus, FiSearch, FiPlay, FiChevronRight } from "react-icons/fi"
 import { ProtectedLayout } from "@/components/protected-layout"
 import { getDashboard } from "@/lib/api"
 import type { DashboardResponse } from "@/lib/types"
@@ -23,6 +28,7 @@ import type { DashboardResponse } from "@/lib/types"
 const IMG_BASE = "https://image.tmdb.org/t/p/w500"
 
 export default function DashboardPage() {
+  const router = useRouter()
   const [data, setData] = useState<DashboardResponse | null>(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
@@ -47,11 +53,63 @@ export default function DashboardPage() {
           </Center>
         ) : (
           <Stack gap={10}>
+            {/* Greeting + Action Buttons */}
+            <Flex
+              direction={{ base: "column", md: "row" }}
+              align={{ base: "start", md: "center" }}
+              justify="space-between"
+              gap={6}
+              bg="bg.default"
+              p={{ base: 6, md: 8 }}
+              rounded="3xl"
+              borderWidth="1px"
+              borderColor="border.subtle"
+              shadow="xs"
+            >
+              <Box>
+                <Heading size="2xl" letterSpacing="tight">
+                  Olá!
+                </Heading>
+                <Text color="fg.muted" fontSize="sm" mt={1}>
+                  Track your TV series, never lose your place.
+                </Text>
+              </Box>
+
+              <Flex gap={3} wrap="wrap">
+                <Button
+                  colorPalette="green"
+                  rounded="full"
+                  gap={1.5}
+                  fontWeight="bold"
+                  fontSize="sm"
+                  onClick={() => router.push("/search")}
+                >
+                  <Icon as={FiPlus} />
+                  Add Series
+                </Button>
+                <Button
+                  variant="outline"
+                  rounded="full"
+                  gap={1.5}
+                  fontWeight="bold"
+                  fontSize="sm"
+                  onClick={() => router.push("/library")}
+                >
+                  <Icon as={FiSearch} color="fg.accent" />
+                  My Library
+                </Button>
+              </Flex>
+            </Flex>
+
+            {/* Continue Watching */}
             {data?.continueWatching && data.continueWatching.length > 0 && (
               <Box>
-                <Heading size="lg" mb={4}>
-                  Continue Watching
-                </Heading>
+                <Flex align="center" gap={2} mb={4}>
+                  <Box w={1.5} h={3} bg="accent.default" rounded="full" />
+                  <Heading size="sm" textTransform="uppercase" letterSpacing="wider" color="fg.muted">
+                    Continue Watching ({data.continueWatching.length})
+                  </Heading>
+                </Flex>
                 <SimpleGrid columns={{ base: 1, sm: 2, md: 3, lg: 4 }} gap={4}>
                   {data.continueWatching.map((item) => (
                     <Link
@@ -60,13 +118,18 @@ export default function DashboardPage() {
                       style={{ textDecoration: "none" }}
                     >
                       <Box
-                        rounded="lg"
+                        rounded="2xl"
                         overflow="hidden"
                         borderWidth="1px"
                         borderColor="border.subtle"
+                        bg="bg.default"
+                        position="relative"
                         _hover={{ shadow: "md" }}
-                        transition="shadow"
+                        transition="all"
                       >
+                        {/* Top accent bar */}
+                        <Box h={1} w="full" bg="accent.default" />
+
                         {item.series.posterPath && (
                           <Image
                             src={`${IMG_BASE}${item.series.posterPath}`}
@@ -76,11 +139,15 @@ export default function DashboardPage() {
                             objectFit="cover"
                           />
                         )}
+
+                        {/* Gradient divider */}
+                        <Box h="2px" w="full" bg="accent.subtle" />
+
                         <Box p={3}>
-                          <Text fontWeight="medium" fontSize="sm" truncate>
+                          <Text fontWeight="semibold" fontSize="sm" truncate>
                             {item.series.name}
                           </Text>
-                          <Text fontSize="xs" color="fg.muted">
+                          <Text fontSize="xs" color="fg.muted" mt={1}>
                             S{item.nextEpisode.seasonNumber}E{item.nextEpisode.episodeNumber}
                           </Text>
                           <Progress.Root
@@ -100,23 +167,35 @@ export default function DashboardPage() {
               </Box>
             )}
 
+            {/* Upcoming */}
             {data?.upcoming && data.upcoming.length > 0 && (
               <Box>
-                <Heading size="lg" mb={4}>
-                  Upcoming
-                </Heading>
+                <Flex align="center" gap={2} mb={4}>
+                  <Box w={1.5} h={3} bg="accent.subtle" rounded="full" />
+                  <Heading size="sm" textTransform="uppercase" letterSpacing="wider" color="fg.muted">
+                    Upcoming ({data.upcoming.length})
+                  </Heading>
+                </Flex>
                 <Stack gap={3}>
                   {data.upcoming.map((item, i) => (
                     <Box
                       key={i}
                       p={4}
-                      rounded="lg"
+                      rounded="2xl"
                       borderWidth="1px"
                       borderColor="border.subtle"
+                      bg="bg.default"
+                      position="relative"
+                      overflow="hidden"
                       display="flex"
                       alignItems="center"
                       gap={4}
+                      _hover={{ shadow: "sm" }}
+                      transition="all"
+                      cursor="pointer"
+                      onClick={() => router.push(`/series/${item.series.id}`)}
                     >
+                      <Box h={1} w="full" bg="accent.subtle" position="absolute" top={0} left={0} />
                       {item.series.posterPath && (
                         <Image
                           src={`${IMG_BASE}${item.series.posterPath}`}
@@ -124,53 +203,66 @@ export default function DashboardPage() {
                           boxSize={12}
                           rounded="md"
                           objectFit="cover"
+                          flexShrink={0}
                         />
                       )}
                       <Box flex={1}>
-                        <Text fontWeight="medium" fontSize="sm">
+                        <Text fontWeight="semibold" fontSize="sm">
                           {item.series.name}
                         </Text>
                         <Text fontSize="xs" color="fg.muted">
                           S{item.episode.seasonNumber}E{item.episode.episodeNumber}
-                          {item.episode.name ? ` - ${item.episode.name}` : ""}
+                          {item.episode.name ? ` — ${item.episode.name}` : ""}
                         </Text>
                       </Box>
-                      <Badge colorPalette="blue" size="sm">
-                        {item.airDate}
-                      </Badge>
+                      <Flex align="center" gap={2}>
+                        <Badge colorPalette="blue" size="sm">
+                          {item.airDate}
+                        </Badge>
+                        <Icon as={FiChevronRight} color="fg.muted" />
+                      </Flex>
                     </Box>
                   ))}
                 </Stack>
               </Box>
             )}
 
+            {/* Recent History */}
             {data?.recentHistory && data.recentHistory.length > 0 && (
               <Box>
-                <Heading size="lg" mb={4}>
-                  Recent History
-                </Heading>
+                <Flex align="center" gap={2} mb={4}>
+                  <Box w={1.5} h={3} bg="fg.muted" rounded="full" opacity={0.4} />
+                  <Heading size="sm" textTransform="uppercase" letterSpacing="wider" color="fg.muted">
+                    Recent History ({data.recentHistory.length})
+                  </Heading>
+                </Flex>
                 <Stack gap={3}>
                   {data.recentHistory.map((item, i) => (
                     <Box
                       key={i}
                       p={4}
-                      rounded="lg"
+                      rounded="2xl"
                       borderWidth="1px"
                       borderColor="border.subtle"
+                      bg="bg.default"
                       display="flex"
                       alignItems="center"
                       gap={4}
+                      _hover={{ shadow: "sm" }}
+                      transition="all"
+                      cursor="pointer"
+                      onClick={() => router.push(`/series/${item.series.id}`)}
                     >
                       <Box flex={1}>
-                        <Text fontWeight="medium" fontSize="sm">
+                        <Text fontWeight="semibold" fontSize="sm">
                           {item.series.name}
                         </Text>
                         <Text fontSize="xs" color="fg.muted">
                           S{item.episode.seasonNumber}E{item.episode.episodeNumber}
-                          {item.episode.name ? ` - ${item.episode.name}` : ""}
+                          {item.episode.name ? ` — ${item.episode.name}` : ""}
                         </Text>
                       </Box>
-                      <Text fontSize="xs" color="fg.muted">
+                      <Text fontSize="xs" color="fg.muted" whiteSpace="nowrap">
                         {new Date(item.watchedAt).toLocaleDateString()}
                       </Text>
                     </Box>
@@ -179,17 +271,27 @@ export default function DashboardPage() {
               </Box>
             )}
 
+            {/* Empty state */}
             {!data?.continueWatching?.length &&
               !data?.upcoming?.length &&
               !data?.recentHistory?.length && (
                 <Center py={20}>
-                  <VStack gap={2}>
+                  <VStack gap={3}>
                     <Text fontSize="lg" fontWeight="medium">
                       Nothing here yet
                     </Text>
                     <Text color="fg.muted">
                       Search for a series to get started
                     </Text>
+                    <Button
+                      colorPalette="green"
+                      rounded="full"
+                      gap={1.5}
+                      onClick={() => router.push("/search")}
+                    >
+                      <Icon as={FiSearch} />
+                      Search Series
+                    </Button>
                   </VStack>
                 </Center>
               )}

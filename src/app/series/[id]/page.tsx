@@ -17,8 +17,8 @@ import {
   Center,
 } from "@chakra-ui/react"
 import { ProtectedLayout } from "@/components/protected-layout"
-import { getSeriesDetail, getSeasonDetail, addToLibrary, removeFromLibrary, setEpisodeProgress } from "@/lib/api"
-import type { SeriesDetailResponse, SeasonDetail as SeasonDetailType } from "@/lib/types"
+import { getSeriesDetail, getSeasonDetail, addToLibrary, removeFromLibrary, setEpisodeProgress, getLibrary } from "@/lib/api"
+import type { SeriesDetailResponse, SeasonDetail as SeasonDetailType, LibraryItem } from "@/lib/types"
 
 const IMG_BASE = "https://image.tmdb.org/t/p/w500"
 
@@ -35,9 +35,10 @@ export default function SeriesDetailPage() {
   useEffect(() => {
     if (!seriesId) return
     setLoading(true)
-    getSeriesDetail(seriesId)
-      .then((data) => {
+    Promise.all([getSeriesDetail(seriesId), getLibrary().catch(() => [] as LibraryItem[])])
+      .then(([data, lib]) => {
         setSeries(data)
+        setInLibrary(Array.isArray(lib) ? lib.some((i: LibraryItem) => i.seriesId === seriesId) : false)
         if (data.seasons && data.seasons.length > 0) {
           const firstRealSeason = data.seasons.find((s) => s.seasonNumber > 0) || data.seasons[0]
           setSelectedSeason(firstRealSeason.seasonNumber)

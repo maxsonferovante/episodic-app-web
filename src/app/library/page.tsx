@@ -9,18 +9,18 @@ import {
   Spinner,
   Stack,
   Text,
-  Badge,
   Center,
-  Button,
-  Image,
 } from "@chakra-ui/react"
 import { ProtectedLayout } from "@/components/protected-layout"
+import { SeriesCard } from "@/components/series-card"
+import { ConfirmDialog } from "@/components/confirm-dialog"
 import { getLibrary, removeFromLibrary } from "@/lib/api"
 import type { LibraryItem } from "@/lib/types"
 
 export default function LibraryPage() {
   const [items, setItems] = useState<LibraryItem[]>([])
   const [loading, setLoading] = useState(true)
+  const [removeTarget, setRemoveTarget] = useState<string | null>(null)
 
   useEffect(() => {
     getLibrary()
@@ -29,15 +29,16 @@ export default function LibraryPage() {
       .finally(() => setLoading(false))
   }, [])
 
-  const handleRemove = async (seriesId: string) => {
+  const handleConfirmRemove = async () => {
+    if (!removeTarget) return
     try {
-      await removeFromLibrary(seriesId)
-      setItems((prev) => prev.filter((i) => i.seriesId !== seriesId))
+      await removeFromLibrary(removeTarget)
+      setItems((prev) => prev.filter((i) => i.seriesId !== removeTarget))
     } catch {}
+    setRemoveTarget(null)
   }
 
-  const tmdbPoster = (path: string | null) =>
-    path ? `https://image.tmdb.org/t/p/w342${path}` : null
+  const targetItem = items.find((i) => i.seriesId === removeTarget)
 
   return (
     <ProtectedLayout>
@@ -55,53 +56,30 @@ export default function LibraryPage() {
           ) : (
             <SimpleGrid columns={{ base: 2, sm: 3, md: 4, lg: 5 }} gap={4}>
               {items.map((item) => (
-                <Box
+                <SeriesCard
                   key={item.id}
-                  rounded="lg"
-                  borderWidth="1px"
-                  borderColor="border.subtle"
-                  overflow="hidden"
-                  _hover={{ shadow: "md" }}
-                  transition="shadow"
-                >
-                  <Box aspectRatio={2/3} bg="bg.muted">
-                    {tmdbPoster(item.posterPath) ? (
-                      <Image
-                        src={tmdbPoster(item.posterPath)}
-                        alt={item.name}
-                        w="full"
-                        h="full"
-                        objectFit="cover"
-                      />
-                    ) : (
-                      <Center h="full">
-                        <Text fontSize="sm" color="fg.muted">No poster</Text>
-                      </Center>
-                    )}
-                  </Box>
-                  <Box p={3}>
-                    <Stack gap={1}>
-                      <Heading size="xs" noOfLines={2}>{item.name}</Heading>
-                      {item.firstAirDate && (
-                        <Text fontSize="xs" color="fg.muted">
-                          {item.firstAirDate.slice(0, 4)}
-                        </Text>
-                      )}
-                      <Button
-                        size="xs"
-                        colorPalette="red"
-                        variant="outline"
-                        onClick={() => handleRemove(item.seriesId)}
-                      >
-                        Remove
-                      </Button>
-                    </Stack>
-                  </Box>
-                </Box>
+                  id={item.seriesId}
+                  name={item.name}
+                  posterPath={item.posterPath}
+                  firstAirDate={item.firstAirDate}
+                  variant="library"
+                  onRemove={() => setRemoveTarget(item.seriesId)}
+                />
               ))}
             </SimpleGrid>
           )}
         </Stack>
+
+        <ConfirmDialog
+          open={!!removeTarget}
+          onOpenChange={(open) => {
+            if (!open) setRemoveTarget(null)
+          }}
+          title="Remove from Library"
+          description={`Are you sure you want to remove "${targetItem?.name}" from your library? Your progress will be lost.`}
+          confirmLabel="Remove"
+          onConfirm={handleConfirmRemove}
+        />
       </Container>
     </ProtectedLayout>
   )
