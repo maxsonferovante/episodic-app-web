@@ -28,7 +28,8 @@ import {
   getEpisodeProgress,
   getLibrary,
 } from "@/lib/api"
-import type { SeriesDetailResponse, SeasonDetail as SeasonDetailType, LibraryItem, Episode, EpisodeProgress } from "@/lib/types"
+import type { SeriesDetailResponse, SeasonDetail as SeasonDetailType, LibraryItem, Episode } from "@/lib/types"
+import { WatchStatus } from "@/lib/constants"
 
 const IMG_BASE = "https://image.tmdb.org/t/p/w500"
 const IMG_ORIGINAL = "https://image.tmdb.org/t/p/original"
@@ -91,7 +92,7 @@ export default function SeriesDetailPage() {
         const progressMap: Record<number, SeasonProgress> = {}
         seasons.forEach((s) => {
           map[s.seasonNumber] = s
-          const watched = s.episodes.filter((ep) => ep.status === "WATCHED").length
+          const watched = s.episodes.filter((ep) => ep.status === WatchStatus.WATCHED).length
           progressMap[s.seasonNumber] = { watched, total: s.episodes.length }
         })
         setAllSeasonsData(map)
@@ -108,7 +109,7 @@ export default function SeriesDetailPage() {
       .then((data) => {
         setSeasonData(data)
         // Update progress for this season
-        const watched = data.episodes.filter((ep) => ep.status === "WATCHED").length
+        const watched = data.episodes.filter((ep) => ep.status === WatchStatus.WATCHED).length
         setSeasonProgressMap((prev) => ({ ...prev, [selectedSeason]: { watched, total: data.episodes.length } }))
       })
       .catch(() => {})
@@ -130,25 +131,26 @@ export default function SeriesDetailPage() {
 
   const handleToggleEpisode = useCallback(
     async (episodeId: string, currentStatus?: string) => {
-      const newStatus = currentStatus === "WATCHED" ? "UNWATCHED" : "WATCHED"
+      const newStatus =
+        currentStatus === WatchStatus.WATCHED ? WatchStatus.UNWATCHED : WatchStatus.WATCHED
       try {
-        await setEpisodeProgress(episodeId, newStatus as "WATCHED" | "UNWATCHED")
+        await setEpisodeProgress(episodeId, newStatus === WatchStatus.WATCHED)
         // Update local season data
         setSeasonData((prev) => {
           if (!prev) return prev
           return {
             ...prev,
             episodes: prev.episodes.map((ep) =>
-              ep.id === episodeId ? { ...ep, status: newStatus as "WATCHED" | "UNWATCHED" } : ep
+              ep.id === episodeId ? { ...ep, status: newStatus } : ep
             ),
           }
         })
         // Update progress map
         if (seasonData) {
           const updatedEpisodes = seasonData.episodes.map((ep) =>
-            ep.id === episodeId ? { ...ep, status: newStatus as "WATCHED" | "UNWATCHED" } : ep
+            ep.id === episodeId ? { ...ep, status: newStatus } : ep
           )
-          const watched = updatedEpisodes.filter((ep) => ep.status === "WATCHED").length
+          const watched = updatedEpisodes.filter((ep) => ep.status === WatchStatus.WATCHED).length
           setSeasonProgressMap((prev) => ({ ...prev, [selectedSeason]: { watched, total: seasonData.episodes.length } }))
         }
       } catch {}
@@ -376,7 +378,7 @@ export default function SeriesDetailPage() {
                   ) : seasonData ? (
                     <Stack gap={2}>
                       {seasonData.episodes.map((ep) => {
-                        const isWatched = ep.status === "WATCHED"
+                        const isWatched = ep.status === WatchStatus.WATCHED
                         const isFuture = ep.airDate ? new Date(ep.airDate) > new Date() : false
                         return (
                           <Box

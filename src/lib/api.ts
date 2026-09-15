@@ -9,8 +9,7 @@ import type {
   LibraryItem,
   DashboardResponse,
   HistoryResponse,
-  EpisodeProgress,
-  ProgressUpdateResponse,
+  ProgressResponse,
   CalendarResponse,
 } from "./types"
 
@@ -214,17 +213,17 @@ export async function getHistory(
 
 export async function getEpisodeProgress(
   episodeId: string,
-): Promise<EpisodeProgress> {
+): Promise<ProgressResponse> {
   return request(`/api/v1/episodes/${episodeId}/progress`)
 }
 
 export async function setEpisodeProgress(
   episodeId: string,
-  status: "WATCHED" | "UNWATCHED",
-): Promise<ProgressUpdateResponse> {
+  watched: boolean,
+): Promise<ProgressResponse> {
   return request(`/api/v1/episodes/${episodeId}/progress`, {
     method: "PUT",
-    body: JSON.stringify({ status }),
+    body: JSON.stringify({ watched }),
   })
 }
 

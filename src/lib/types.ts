@@ -1,3 +1,5 @@
+import type { EpisodeStatus, LibraryStatus, WatchStatus } from "./constants"
+
 export interface User {
   id: string
   name: string
@@ -68,7 +70,7 @@ export interface Episode {
   airDate: string | null
   runtime: number | null
   voteAverage: number | null
-  status?: "UPCOMING" | "AVAILABLE" | "WATCHED" | "UNWATCHED"
+  status?: EpisodeStatus
 }
 
 export interface SeasonDetail extends Season {
@@ -103,7 +105,7 @@ export interface SeriesProgress {
 export interface LibraryEntry {
   series: SeriesSummary
   progress: SeriesProgress
-  status: "IN_PROGRESS" | "CAUGHT_UP" | "COMPLETED"
+  status: LibraryStatus
   nextEpisode: { seasonNumber: number; episodeNumber: number } | null
 }
 
@@ -148,16 +150,22 @@ export interface HistoryResponse {
   nextCursor: string | null
 }
 
-export interface EpisodeProgress {
-  episodeId: string
-  status: "WATCHED" | "UNWATCHED"
-  watchedAt: string | null
-}
-
-export interface ProgressUpdateResponse {
-  episode: { id: string; status: string }
-  progress: { seriesPercentage: number; seasonPercentage: number }
-  nextEpisode: { id: string; seasonNumber: number; episodeNumber: number } | null
+export interface ProgressResponse {
+  episode: {
+    episodeId: string
+    status: WatchStatus
+    watchedAt?: string | null
+  }
+  progress: {
+    seriesPercentage: number
+    seasonPercentage: number
+  }
+  nextEpisode: {
+    episodeId: string
+    seriesId: string
+    seasonNumber: number
+    episodeNumber: number
+  } | null
 }
 
 export interface CalendarItem {

@@ -35,7 +35,8 @@ import {
   getEpisodeProgress,
   setEpisodeProgress,
 } from "@/lib/api"
-import type { Episode, SeasonDetail, SeriesDetailResponse, EpisodeProgress as EpisodeProgressType } from "@/lib/types"
+import type { Episode, SeriesDetailResponse, ProgressResponse } from "@/lib/types"
+import { WatchStatus } from "@/lib/constants"
 
 const IMG_BASE = "https://image.tmdb.org/t/p/w500"
 const IMG_ORIGINAL = "https://image.tmdb.org/t/p/original"
@@ -49,7 +50,7 @@ export default function EpisodeDetailPage() {
   const [series, setSeries] = useState<SeriesDetailResponse | null>(null)
   const [episode, setEpisode] = useState<Episode | null>(null)
   const [seasonNumber, setSeasonNumber] = useState<number>(0)
-  const [progress, setProgress] = useState<EpisodeProgressType | null>(null)
+  const [progress, setProgress] = useState<ProgressResponse | null>(null)
   const [loading, setLoading] = useState(true)
   const [actionLoading, setActionLoading] = useState(false)
   const [prevEpisode, setPrevEpisode] = useState<Episode | null>(null)
@@ -114,18 +115,19 @@ export default function EpisodeDetailPage() {
   const handleToggleWatched = useCallback(async () => {
     if (!episodeDbId) return
     setActionLoading(true)
-    const newStatus = progress?.status === "WATCHED" ? "UNWATCHED" : "WATCHED"
+    const newStatus =
+      progress?.episode.status === WatchStatus.WATCHED ? WatchStatus.UNWATCHED : WatchStatus.WATCHED
     try {
-      await setEpisodeProgress(episodeDbId, newStatus)
-      setProgress((prev) => (prev ? { ...prev, status: newStatus } : { episodeId: episodeDbId, status: newStatus, watchedAt: new Date().toISOString() }))
+      const res = await setEpisodeProgress(episodeDbId, newStatus === WatchStatus.WATCHED)
+      setProgress(res)
     } catch {}
     finally {
       setActionLoading(false)
     }
   }, [episodeDbId, progress])
 
-  const isWatched = progress?.status === "WATCHED"
-  const watchedAt = progress?.watchedAt
+  const isWatched = progress?.episode.status === WatchStatus.WATCHED
+  const watchedAt = progress?.episode.watchedAt
   const isFuture = episode?.airDate ? new Date(episode.airDate) > new Date() : false
 
   return (
