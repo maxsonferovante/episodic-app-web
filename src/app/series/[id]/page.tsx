@@ -17,7 +17,7 @@ import {
   Progress,
   Icon,
 } from "@chakra-ui/react"
-import { FiCheck, FiPlus, FiPlay, FiClock, FiCalendar, FiFilm, FiChevronRight, FiTrendingUp } from "react-icons/fi"
+import { FiCheck, FiPlus, FiPlay, FiClock, FiCalendar, FiFilm, FiChevronRight, FiTrendingUp, FiX } from "react-icons/fi"
 import { ProtectedLayout } from "@/components/protected-layout"
 import {
   getSeriesDetail,
@@ -25,6 +25,7 @@ import {
   addToLibrary,
   removeFromLibrary,
   setEpisodeProgress,
+  setSeasonProgress,
   getEpisodeProgress,
   getLibrary,
 } from "@/lib/api"
@@ -52,11 +53,18 @@ export default function SeriesDetailPage() {
   const [seasonLoading, setSeasonLoading] = useState(false)
   const [inLibrary, setInLibrary] = useState(false)
   const [actionLoading, setActionLoading] = useState(false)
+  const [seasonActionLoading, setSeasonActionLoading] = useState(false)
   const [allSeasonsData, setAllSeasonsData] = useState<Record<number, SeasonDetailType>>({})
 
   const totalWatched = Object.values(seasonProgressMap).reduce((a, b) => a + b.watched, 0)
   const totalEpisodes = Object.values(seasonProgressMap).reduce((a, b) => a + b.total, 0)
   const pct = totalEpisodes > 0 ? Math.round((totalWatched / totalEpisodes) * 100) : 0
+
+  const selectedSeasonProgress = seasonProgressMap[selectedSeason]
+  const seasonFullyWatched =
+    !!selectedSeasonProgress &&
+    selectedSeasonProgress.total > 0 &&
+    selectedSeasonProgress.watched >= selectedSeasonProgress.total
 
   // Load series detail
   useEffect(() => {
@@ -156,6 +164,29 @@ export default function SeriesDetailPage() {
       } catch {}
     },
     [selectedSeason, seasonData]
+  )
+
+  const handleToggleSeason = useCallback(
+    async (seasonNumber: number) => {
+      const prog = seasonProgressMap[seasonNumber]
+      if (!prog || prog.total === 0) return
+      const markWatched = prog.watched < prog.total
+      setSeasonActionLoading(true)
+      try {
+        await setSeasonProgress(seriesId, seasonNumber, markWatched)
+        const data = await getSeasonDetail(seriesId, seasonNumber)
+        setSeasonData(data)
+        const watched = data.episodes.filter((ep) => ep.status === WatchStatus.WATCHED).length
+        setSeasonProgressMap((prev) => ({
+          ...prev,
+          [seasonNumber]: { watched, total: data.episodes.length },
+        }))
+      } catch {}
+      finally {
+        setSeasonActionLoading(false)
+      }
+    },
+    [seasonProgressMap, seriesId],
   )
 
   const handleEpisodeClick = (episode: Episode) => {
@@ -351,13 +382,27 @@ export default function SeriesDetailPage() {
                   {/* Season Progress Bar */}
                   {seasonProgressMap[selectedSeason] && (
                     <Box mt={3} mb={4}>
-                      <Flex justifyContent="space-between" mb={1}>
+                      <Flex justifyContent="space-between" alignItems="center" gap={3} wrap="wrap" mb={1}>
                         <Text fontSize="xs" color="fg.muted">
                           Season progress
                         </Text>
-                        <Text fontSize="xs" fontWeight="semibold">
-                          {seasonProgressMap[selectedSeason].watched}/{seasonProgressMap[selectedSeason].total} episodes
-                        </Text>
+                        <Flex align="center" gap={3}>
+                          <Text fontSize="xs" fontWeight="semibold">
+                            {seasonProgressMap[selectedSeason].watched}/{seasonProgressMap[selectedSeason].total} episodes
+                          </Text>
+                          <Button
+                            size="xs"
+                            variant="outline"
+                            rounded="full"
+                            borderColor="border.subtle"
+                            fontWeight="semibold"
+                            loading={seasonActionLoading}
+                            onClick={() => handleToggleSeason(selectedSeason)}
+                          >
+                            <Icon as={seasonFullyWatched ? FiX : FiCheck} />
+                            {seasonFullyWatched ? "Unmark season" : "Mark season watched"}
+                          </Button>
+                        </Flex>
                       </Flex>
                       <Progress.Root
                         value={Math.round(

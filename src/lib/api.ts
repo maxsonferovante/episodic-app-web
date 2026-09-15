@@ -227,6 +227,28 @@ export async function setEpisodeProgress(
   })
 }
 
+export interface SeasonProgressResult {
+  seriesId: string
+  seasonNumber: number
+  watched: boolean
+  updatedEpisodes: number
+}
+
+/** Mark/unmark every episode of a season in a single request. */
+export async function setSeasonProgress(
+  seriesId: string,
+  seasonNumber: number,
+  watched: boolean,
+): Promise<SeasonProgressResult> {
+  return request(
+    `/api/v1/episodes/season/${encodeURIComponent(seriesId)}/${seasonNumber}/progress`,
+    {
+      method: "PUT",
+      body: JSON.stringify({ watched }),
+    },
+  )
+}
+
 export async function getCalendar(
   from: string,
   to: string,
