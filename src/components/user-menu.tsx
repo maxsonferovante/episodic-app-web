@@ -64,15 +64,16 @@ export function UserMenu({ onOpenProfile }: UserMenuProps) {
         </Flex>
       </Menu.Trigger>
       <Portal>
-        <Menu.Content
-          rounded="2xl"
-          w={60}
-          p={1.5}
-          shadow="menu"
-          borderWidth="1px"
-          borderColor="border.subtle"
-          bg="bg.panel"
-        >
+        <Menu.Positioner>
+          <Menu.Content
+            rounded="2xl"
+            w={60}
+            p={1.5}
+            shadow="menu"
+            borderWidth="1px"
+            borderColor="border.subtle"
+            bg="bg.panel"
+          >
           {/* Header */}
           <Box
             px={3}
@@ -131,7 +132,8 @@ export function UserMenu({ onOpenProfile }: UserMenuProps) {
             <Icon as={FiLogOut} />
             <Text fontSize="sm">Logout</Text>
           </Menu.Item>
-        </Menu.Content>
+          </Menu.Content>
+        </Menu.Positioner>
       </Portal>
     </Menu.Root>
   )
