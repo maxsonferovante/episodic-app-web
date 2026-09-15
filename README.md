@@ -1,36 +1,86 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Episodic — Web
 
-## Getting Started
+The web app for **Episodic**, a personal TV series tracker: sign in with Google,
+build a library, mark episodes as watched and follow your progress, history and
+upcoming episodes.
 
-First, run the development server:
+**Live:** https://episodic-app-web.vercel.app
+
+## Features
+
+- Google sign-in (Identity Services)
+- Search series through the catalog API
+- Personal library with per-series progress (thin bar + "N of M episodes watched")
+- Series detail with seasons/episodes, watched toggles and *mark season watched*
+  (aired episodes only)
+- Episode detail with own progress and previous/next navigation
+- Dashboard with *Continue Watching* and *Upcoming* (one next episode per series)
+- Recent history shown as the search screen's empty state
+- Public Privacy Policy and Terms of Use
+- Light/dark theme on a Geist (Vercel-inspired) design system
+
+## Tech stack
+
+Next.js 16 (App Router, Turbopack) · React 19 · TypeScript · Chakra UI v3 with a
+custom Geist theme · `react-icons` · `@react-oauth/google` · Vercel Analytics.
+
+## Getting started
 
 ```bash
+npm install
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Open http://localhost:3000.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+### Environment variables
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+Create a `.env` file:
 
-## Learn More
+| Variable | Description |
+| --- | --- |
+| `NEXT_PUBLIC_API_URL` | Base URL of the backend API (API Gateway) |
+| `NEXT_PUBLIC_GOOGLE_CLIENT_ID` | Google OAuth **Web** client id |
 
-To learn more about Next.js, take a look at the following resources:
+Only `NEXT_PUBLIC_*` values reach the browser. Never put backend secrets
+(`JWT_SECRET`, `TMDB_API_KEY`) in these variables.
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## Scripts
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+| Command | Description |
+| --- | --- |
+| `npm run dev` | Start the development server |
+| `npm run build` | Production build |
+| `npm run start` | Run the production build |
+| `npm run lint` | Lint with ESLint |
 
-## Deploy on Vercel
+## Project structure
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+```
+src/
+  app/          routes: dashboard, search, library, series/[id],
+                series/[id]/episodes/[episodeId], history, login,
+                privacy-policy, terms-of-use
+  components/   app shell, cards, dialogs, google button, legal layout, ...
+  contexts/     auth context
+  lib/          API client, types, constants
+  theme/        Chakra Geist system (colors, tokens, shadows)
+public/         logo (svg/png) and static assets
+```
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+## Deploy
+
+Deployed on Vercel. Set the two `NEXT_PUBLIC_*` variables in the project
+settings — `.env` files are not uploaded (see `.vercelignore`). Remember to add
+the production domain to the Google OAuth client's **Authorized JavaScript
+origins**.
+
+## Related repos
+
+- [episodic-app-backend](https://github.com/maxsonferovante/episodic-app-backend) — serverless API (Rust + AWS Lambda)
+- [episodic-app-infra-cloud](https://github.com/maxsonferovante/episodic-app-infra-cloud) — AWS infrastructure (Terraform)
+
+## License
+
+MIT © Maxson Almeida. TMDB metadata is provided by TMDB; this product uses the
+TMDB API but is not endorsed or certified by TMDB.
