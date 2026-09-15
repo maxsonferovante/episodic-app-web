@@ -7,9 +7,9 @@ import {
   Flex,
   HStack,
   IconButton,
+  Image,
   Text,
   useBreakpointValue,
-  Icon,
 } from "@chakra-ui/react"
 import { FiSearch, FiBookOpen, FiClock, FiHome, FiMenu, FiX } from "react-icons/fi"
 import { useState } from "react"
@@ -67,17 +67,12 @@ export function AppShell({ children }: { children: React.ReactNode }) {
               )}
               <Link href="/" style={{ textDecoration: "none" }}>
                 <HStack gap={2}>
-                  <Flex
-                    bg="accent.subtle"
-                    color="fg.accent"
-                    p={1.5}
+                  <Image
+                    src="/logo.svg"
+                    alt="Episodic"
+                    boxSize={8}
                     rounded="lg"
-                    align="center"
-                    justify="center"
-                    shadow="xs"
-                  >
-                    <Icon as={FiHome} boxSize={4} />
-                  </Flex>
+                  />
                   <Text fontSize="lg" fontWeight="bold" color="fg" letterSpacing="tight">
                     Episodic
                   </Text>

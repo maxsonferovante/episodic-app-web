@@ -1,0 +1,6 @@
+<svg width="512" height="512" viewBox="0 0 512 512" fill="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Episodic">
+  <title>Episodic</title>
+  <path d="M216 164L336 233L216 302Z" fill="currentColor" stroke="currentColor" stroke-width="30" stroke-linejoin="round"/>
+  <rect x="150" y="372" width="212" height="20" rx="10" fill="currentColor" fill-opacity="0.25"/>
+  <rect x="150" y="372" width="132" height="20" rx="10" fill="currentColor"/>
+</svg>
