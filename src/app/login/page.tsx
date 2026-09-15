@@ -16,6 +16,7 @@ import {
   Badge,
 } from "@chakra-ui/react"
 import { GoogleButton } from "@/components/google-button"
+import { DevCredit } from "@/components/dev-credit"
 import { useAuth } from "@/contexts/auth-context"
 import { FiTv, FiClock, FiBookOpen, FiStar, FiChevronDown } from "react-icons/fi"
 
@@ -184,9 +185,12 @@ export default function LoginPage() {
                   }}
                 />
               </Box>
-              <Text fontSize="xs" color="fg.muted" textAlign="center">
-                Episodic
-              </Text>
+              <VStack gap={2} pt={1}>
+                <Text fontSize="xs" color="fg.muted" fontFamily="mono">
+                  Episodic
+                </Text>
+                <DevCredit size="md" />
+              </VStack>
             </VStack>
           </Flex>
 

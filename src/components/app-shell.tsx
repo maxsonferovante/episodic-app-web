@@ -15,6 +15,7 @@ import { FiSearch, FiBookOpen, FiClock, FiHome, FiMenu, FiX } from "react-icons/
 import { useState } from "react"
 import { UserMenu } from "@/components/user-menu"
 import { ProfileDialog } from "@/components/profile-dialog"
+import { DevCredit } from "@/components/dev-credit"
 
 const navLinks = [
   { href: "/", label: "Home", icon: FiHome },
@@ -167,13 +168,15 @@ export function AppShell({ children }: { children: React.ReactNode }) {
         bg="bg.muted"
         borderTopWidth="1px"
         borderColor="border.subtle"
-        py={3}
+        py={4}
         px={6}
-        textAlign="center"
       >
-        <Text fontSize="xs" color="fg.muted" fontFamily="mono">
-          Episodic
-        </Text>
+        <Flex direction="column" align="center" gap={2}>
+          <Text fontSize="xs" color="fg.muted" fontFamily="mono">
+            Episodic
+          </Text>
+          <DevCredit />
+        </Flex>
       </Box>
 
       <ProfileDialog
