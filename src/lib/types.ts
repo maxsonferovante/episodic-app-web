@@ -39,6 +39,11 @@ export interface SeriesDetail extends SeriesSummary {
   numberOfSeasons: number
   numberOfEpisodes: number
   providers?: WatchProvider[]
+  progress?: {
+    watchedEpisodes: number
+    totalEpisodes: number
+    percentage: number
+  }
 }
 
 export interface WatchProvider {
@@ -57,6 +62,7 @@ export interface Season {
   posterPath: string | null
   airDate: string | null
   episodeCount: number
+  watchedEpisodes?: number
 }
 
 export interface Episode {

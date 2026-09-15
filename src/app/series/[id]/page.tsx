@@ -35,11 +35,6 @@ import { WatchStatus } from "@/lib/constants"
 const IMG_BASE = "https://image.tmdb.org/t/p/w500"
 const IMG_ORIGINAL = "https://image.tmdb.org/t/p/original"
 
-interface SeasonProgress {
-  watched: number
-  total: number
-}
-
 export default function SeriesDetailPage() {
   const params = useParams()
   const router = useRouter()
@@ -48,23 +43,22 @@ export default function SeriesDetailPage() {
   const [series, setSeries] = useState<SeriesDetailResponse | null>(null)
   const [selectedSeason, setSelectedSeason] = useState<number>(1)
   const [seasonData, setSeasonData] = useState<SeasonDetailType | null>(null)
-  const [seasonProgressMap, setSeasonProgressMap] = useState<Record<number, SeasonProgress>>({})
   const [loading, setLoading] = useState(true)
   const [seasonLoading, setSeasonLoading] = useState(false)
   const [inLibrary, setInLibrary] = useState(false)
   const [actionLoading, setActionLoading] = useState(false)
   const [seasonActionLoading, setSeasonActionLoading] = useState(false)
-  const [allSeasonsData, setAllSeasonsData] = useState<Record<number, SeasonDetailType>>({})
 
-  const totalWatched = Object.values(seasonProgressMap).reduce((a, b) => a + b.watched, 0)
-  const totalEpisodes = Object.values(seasonProgressMap).reduce((a, b) => a + b.total, 0)
-  const pct = totalEpisodes > 0 ? Math.round((totalWatched / totalEpisodes) * 100) : 0
+  // Progress is computed by the backend and returned with the series.
+  const totalWatched = series?.progress?.watchedEpisodes ?? 0
+  const totalEpisodes = series?.progress?.totalEpisodes ?? 0
+  const pct = series?.progress?.percentage ?? 0
 
-  const selectedSeasonProgress = seasonProgressMap[selectedSeason]
+  const selectedSeasonMeta = series?.seasons?.find((s) => s.seasonNumber === selectedSeason)
   const seasonFullyWatched =
-    !!selectedSeasonProgress &&
-    selectedSeasonProgress.total > 0 &&
-    selectedSeasonProgress.watched >= selectedSeasonProgress.total
+    !!selectedSeasonMeta &&
+    (selectedSeasonMeta.episodeCount ?? 0) > 0 &&
+    (selectedSeasonMeta.watchedEpisodes ?? 0) >= (selectedSeasonMeta.episodeCount ?? 0)
 
   // Load series detail
   useEffect(() => {
@@ -90,36 +84,12 @@ export default function SeriesDetailPage() {
       .catch(() => setInLibrary(false))
   }, [seriesId])
 
-  // Load all seasons to compute progress
-  useEffect(() => {
-    if (!series || !series.seasons) return
-    const realSeasons = series.seasons.filter((s) => s.seasonNumber > 0)
-    Promise.all(realSeasons.map((s) => getSeasonDetail(seriesId, s.seasonNumber)))
-      .then((seasons) => {
-        const map: Record<number, SeasonDetailType> = {}
-        const progressMap: Record<number, SeasonProgress> = {}
-        seasons.forEach((s) => {
-          map[s.seasonNumber] = s
-          const watched = s.episodes.filter((ep) => ep.status === WatchStatus.WATCHED).length
-          progressMap[s.seasonNumber] = { watched, total: s.episodes.length }
-        })
-        setAllSeasonsData(map)
-        setSeasonProgressMap(progressMap)
-      })
-      .catch(() => {})
-  }, [series, seriesId])
-
-  // Load selected season detail
+  // Load the selected season's episodes (the backend returns each episode status).
   useEffect(() => {
     if (!seriesId || !selectedSeason) return
     setSeasonLoading(true)
     getSeasonDetail(seriesId, selectedSeason)
-      .then((data) => {
-        setSeasonData(data)
-        // Update progress for this season
-        const watched = data.episodes.filter((ep) => ep.status === WatchStatus.WATCHED).length
-        setSeasonProgressMap((prev) => ({ ...prev, [selectedSeason]: { watched, total: data.episodes.length } }))
-      })
+      .then(setSeasonData)
       .catch(() => {})
       .finally(() => setSeasonLoading(false))
   }, [seriesId, selectedSeason])
@@ -129,7 +99,12 @@ export default function SeriesDetailPage() {
     setActionLoading(true)
     try {
       if (inLibrary) await removeFromLibrary(seriesId)
-      else await addToLibrary(seriesId)
+      else
+        await addToLibrary(seriesId, {
+          name: series?.name,
+          posterPath: series?.posterPath,
+          firstAirDate: series?.firstAirDate,
+        })
       setInLibrary(!inLibrary)
     } catch {}
     finally {
@@ -137,56 +112,44 @@ export default function SeriesDetailPage() {
     }
   }
 
+  // Re-read the backend-computed progress (series + the given season).
+  const refreshAfterChange = useCallback(
+    async (seasonNumber: number) => {
+      const [seriesData, season] = await Promise.all([
+        getSeriesDetail(seriesId).catch(() => null),
+        getSeasonDetail(seriesId, seasonNumber).catch(() => null),
+      ])
+      if (seriesData) setSeries(seriesData)
+      if (season) setSeasonData(season)
+    },
+    [seriesId],
+  )
+
   const handleToggleEpisode = useCallback(
     async (episodeId: string, currentStatus?: string) => {
-      const newStatus =
-        currentStatus === WatchStatus.WATCHED ? WatchStatus.UNWATCHED : WatchStatus.WATCHED
       try {
-        await setEpisodeProgress(episodeId, newStatus === WatchStatus.WATCHED)
-        // Update local season data
-        setSeasonData((prev) => {
-          if (!prev) return prev
-          return {
-            ...prev,
-            episodes: prev.episodes.map((ep) =>
-              ep.id === episodeId ? { ...ep, status: newStatus } : ep
-            ),
-          }
-        })
-        // Update progress map
-        if (seasonData) {
-          const updatedEpisodes = seasonData.episodes.map((ep) =>
-            ep.id === episodeId ? { ...ep, status: newStatus } : ep
-          )
-          const watched = updatedEpisodes.filter((ep) => ep.status === WatchStatus.WATCHED).length
-          setSeasonProgressMap((prev) => ({ ...prev, [selectedSeason]: { watched, total: seasonData.episodes.length } }))
-        }
+        await setEpisodeProgress(episodeId, currentStatus !== WatchStatus.WATCHED)
+        await refreshAfterChange(selectedSeason)
       } catch {}
     },
-    [selectedSeason, seasonData]
+    [refreshAfterChange, selectedSeason],
   )
 
   const handleToggleSeason = useCallback(
     async (seasonNumber: number) => {
-      const prog = seasonProgressMap[seasonNumber]
-      if (!prog || prog.total === 0) return
-      const markWatched = prog.watched < prog.total
+      const meta = series?.seasons?.find((s) => s.seasonNumber === seasonNumber)
+      if (!meta || (meta.episodeCount ?? 0) === 0) return
+      const markWatched = (meta.watchedEpisodes ?? 0) < (meta.episodeCount ?? 0)
       setSeasonActionLoading(true)
       try {
         await setSeasonProgress(seriesId, seasonNumber, markWatched)
-        const data = await getSeasonDetail(seriesId, seasonNumber)
-        setSeasonData(data)
-        const watched = data.episodes.filter((ep) => ep.status === WatchStatus.WATCHED).length
-        setSeasonProgressMap((prev) => ({
-          ...prev,
-          [seasonNumber]: { watched, total: data.episodes.length },
-        }))
+        await refreshAfterChange(seasonNumber)
       } catch {}
       finally {
         setSeasonActionLoading(false)
       }
     },
-    [seasonProgressMap, seriesId],
+    [series, seriesId, refreshAfterChange],
   )
 
   const handleEpisodeClick = (episode: Episode) => {
@@ -343,8 +306,9 @@ export default function SeriesDetailPage() {
                 >
                   {series.seasons.map((s) => {
                     const isActive = s.seasonNumber === selectedSeason
-                    const prog = seasonProgressMap[s.seasonNumber]
-                    const seasonPct = prog ? Math.round((prog.watched / Math.max(prog.total, 1)) * 100) : 0
+                    const watched = s.watchedEpisodes ?? 0
+                    const total = s.episodeCount ?? 0
+                    const seasonPct = total > 0 ? Math.round((watched / total) * 100) : 0
                     return (
                       <Button
                         key={s.id}
@@ -364,14 +328,14 @@ export default function SeriesDetailPage() {
                         onClick={() => setSelectedSeason(s.seasonNumber)}
                       >
                         {s.seasonNumber === 0 ? "Specials" : `T${s.seasonNumber}`}
-                        {prog && prog.total > 0 && (
+                        {total > 0 && (
                           <Text
                             as="span"
                             fontSize="xs"
                             fontFamily="mono"
                             color={seasonPct === 100 ? "fg.success" : isActive ? "fg.muted" : "fg.subtle"}
                           >
-                            {prog.watched}/{prog.total}
+                            {watched}/{total}
                           </Text>
                         )}
                       </Button>
@@ -380,7 +344,7 @@ export default function SeriesDetailPage() {
                 </Box>
 
                   {/* Season Progress Bar */}
-                  {seasonProgressMap[selectedSeason] && (
+                  {selectedSeasonMeta && (selectedSeasonMeta.episodeCount ?? 0) > 0 && (
                     <Box mt={3} mb={4}>
                       <Flex justifyContent="space-between" alignItems="center" gap={3} wrap="wrap" mb={1}>
                         <Text fontSize="xs" color="fg.muted">
@@ -388,7 +352,7 @@ export default function SeriesDetailPage() {
                         </Text>
                         <Flex align="center" gap={3}>
                           <Text fontSize="xs" fontWeight="semibold">
-                            {seasonProgressMap[selectedSeason].watched}/{seasonProgressMap[selectedSeason].total} episodes
+                            {selectedSeasonMeta.watchedEpisodes ?? 0}/{selectedSeasonMeta.episodeCount} episodes
                           </Text>
                           <Button
                             size="xs"
@@ -406,7 +370,7 @@ export default function SeriesDetailPage() {
                       </Flex>
                       <Progress.Root
                         value={Math.round(
-                          (seasonProgressMap[selectedSeason].watched / Math.max(seasonProgressMap[selectedSeason].total, 1)) * 100
+                          ((selectedSeasonMeta.watchedEpisodes ?? 0) / Math.max(selectedSeasonMeta.episodeCount ?? 0, 1)) * 100
                         )}
                         size="xs"
                         rounded="full"

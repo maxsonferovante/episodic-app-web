@@ -71,10 +71,14 @@ export default function SearchPage() {
     return () => clearTimeout(timer)
   }, [query, doSearch])
 
-  const handleAdd = async (seriesId: string) => {
+  const handleAdd = async (series: SeriesSummary) => {
     try {
-      await addToLibrary(seriesId)
-      setLibraryIds((prev) => new Set([...prev, seriesId]))
+      await addToLibrary(series.id, {
+        name: series.name,
+        posterPath: series.posterPath,
+        firstAirDate: series.firstAirDate,
+      })
+      setLibraryIds((prev) => new Set([...prev, series.id]))
     } catch {}
   }
 
@@ -108,7 +112,7 @@ export default function SearchPage() {
                       variant="search"
                       onAdd={
                         !inLibrary
-                          ? () => handleAdd(series.id)
+                          ? () => handleAdd(series)
                           : undefined
                       }
                     />

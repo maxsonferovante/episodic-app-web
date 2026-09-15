@@ -188,8 +188,20 @@ export async function getLibrary(): Promise<LibraryResponse> {
 
 export async function addToLibrary(
   seriesId: string,
+  meta?: {
+    name?: string | null
+    posterPath?: string | null
+    firstAirDate?: string | null
+  },
 ): Promise<LibraryItem> {
-  return request(`/api/v1/library/${seriesId}`, { method: "PUT", body: "{}" })
+  return request(`/api/v1/library/${seriesId}`, {
+    method: "PUT",
+    body: JSON.stringify({
+      name: meta?.name ?? null,
+      posterPath: meta?.posterPath ?? null,
+      firstAirDate: meta?.firstAirDate ?? null,
+    }),
+  })
 }
 
 export async function removeFromLibrary(
