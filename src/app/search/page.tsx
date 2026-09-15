@@ -1,6 +1,7 @@
 "use client"
 
 import { useCallback, useEffect, useState } from "react"
+import { useRouter } from "next/navigation"
 import {
   Box,
   Container,
@@ -15,16 +16,18 @@ import {
 } from "@chakra-ui/react"
 import { ProtectedLayout } from "@/components/protected-layout"
 import { SeriesCard } from "@/components/series-card"
-import { searchSeries, addToLibrary, getLibrary } from "@/lib/api"
-import type { SeriesSummary, LibraryItem } from "@/lib/types"
+import { searchSeries, addToLibrary, getLibrary, getDashboard } from "@/lib/api"
+import type { SeriesSummary, LibraryItem, HistoryItem } from "@/lib/types"
 
 export default function SearchPage() {
+  const router = useRouter()
   const [query, setQuery] = useState("")
   const [results, setResults] = useState<SeriesSummary[]>([])
   const [loading, setLoading] = useState(false)
   const [page, setPage] = useState(1)
   const [totalPages, setTotalPages] = useState(0)
   const [libraryIds, setLibraryIds] = useState<Set<string>>(new Set())
+  const [recentHistory, setRecentHistory] = useState<HistoryItem[]>([])
 
   useEffect(() => {
     getLibrary()
@@ -33,6 +36,12 @@ export default function SearchPage() {
           setLibraryIds(new Set(data.map((i: LibraryItem) => i.seriesId)))
         }
       })
+      .catch(() => {})
+  }, [])
+
+  useEffect(() => {
+    getDashboard()
+      .then((data) => setRecentHistory(data.recentHistory ?? []))
       .catch(() => {})
   }, [])
 
@@ -142,6 +151,51 @@ export default function SearchPage() {
           ) : query.trim() ? (
             <Box py={10} textAlign="center">
               <Text color="fg.muted">No results found</Text>
+            </Box>
+          ) : recentHistory.length > 0 ? (
+            <Box>
+              <Flex align="center" gap={2} mb={4}>
+                <Box w={1.5} h={3} bg="fg.muted" rounded="full" opacity={0.4} />
+                <Heading size="sm" textTransform="uppercase" letterSpacing="wider" color="fg.muted">
+                  Recent History ({recentHistory.length})
+                </Heading>
+              </Flex>
+              <Stack gap={3}>
+                {recentHistory.map((item, i) => (
+                  <Box
+                    key={i}
+                    p={4}
+                    rounded="2xl"
+                    borderWidth="1px"
+                    borderColor="border.subtle"
+                    bg="bg"
+                    display="flex"
+                    alignItems="center"
+                    gap={4}
+                    _hover={{ shadow: "sm" }}
+                    transition="all"
+                    cursor="pointer"
+                    onClick={() =>
+                      router.push(
+                        `/series/${item.series.id}/episodes/${item.episode.seasonNumber}-${item.episode.episodeNumber}`,
+                      )
+                    }
+                  >
+                    <Box flex={1}>
+                      <Text fontWeight="semibold" fontSize="sm">
+                        {item.series.name}
+                      </Text>
+                      <Text fontSize="xs" color="fg.muted">
+                        S{item.episode.seasonNumber}E{item.episode.episodeNumber}
+                        {item.episode.name ? ` — ${item.episode.name}` : ""}
+                      </Text>
+                    </Box>
+                    <Text fontSize="xs" color="fg.muted" whiteSpace="nowrap">
+                      {new Date(item.watchedAt).toLocaleDateString()}
+                    </Text>
+                  </Box>
+                ))}
+              </Stack>
             </Box>
           ) : (
             <Box py={10} textAlign="center">

@@ -232,58 +232,9 @@ export default function DashboardPage() {
               </Box>
             )}
 
-            {/* Recent History */}
-            {data?.recentHistory && data.recentHistory.length > 0 && (
-              <Box>
-                <Flex align="center" gap={2} mb={4}>
-                  <Box w={1.5} h={3} bg="fg.muted" rounded="full" opacity={0.4} />
-                  <Heading size="sm" textTransform="uppercase" letterSpacing="wider" color="fg.muted">
-                    Recent History ({data.recentHistory.length})
-                  </Heading>
-                </Flex>
-                <Stack gap={3}>
-                  {data.recentHistory.map((item, i) => (
-                    <Box
-                      key={i}
-                      p={4}
-                      rounded="2xl"
-                      borderWidth="1px"
-                      borderColor="border.subtle"
-                      bg="bg"
-                      display="flex"
-                      alignItems="center"
-                      gap={4}
-                      _hover={{ shadow: "sm" }}
-                      transition="all"
-                      cursor="pointer"
-                      onClick={() =>
-                        router.push(
-                          `/series/${item.series.id}/episodes/${item.episode.seasonNumber}-${item.episode.episodeNumber}`,
-                        )
-                      }
-                    >
-                      <Box flex={1}>
-                        <Text fontWeight="semibold" fontSize="sm">
-                          {item.series.name}
-                        </Text>
-                        <Text fontSize="xs" color="fg.muted">
-                          S{item.episode.seasonNumber}E{item.episode.episodeNumber}
-                          {item.episode.name ? ` — ${item.episode.name}` : ""}
-                        </Text>
-                      </Box>
-                      <Text fontSize="xs" color="fg.muted" whiteSpace="nowrap">
-                        {new Date(item.watchedAt).toLocaleDateString()}
-                      </Text>
-                    </Box>
-                  ))}
-                </Stack>
-              </Box>
-            )}
-
             {/* Empty state */}
             {!data?.continueWatching?.length &&
-              !data?.upcoming?.length &&
-              !data?.recentHistory?.length && (
+              !data?.upcoming?.length && (
                 <Center py={20}>
                   <VStack gap={3}>
                     <Text fontSize="lg" fontWeight="medium">
