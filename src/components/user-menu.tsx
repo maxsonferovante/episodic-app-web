@@ -108,15 +108,19 @@ export function UserMenu({ onOpenProfile }: UserMenuProps) {
           </Menu.Item>
 
           {/* Privacy */}
-          <Menu.Item value="privacy" gap={2.5} rounded="lg">
-            <Icon as={FiShield} color="fg.accent" />
-            <Text fontSize="sm">Privacy Policy</Text>
+          <Menu.Item value="privacy" gap={2.5} rounded="lg" asChild>
+            <Link href="/privacy-policy" style={{ textDecoration: "none" }}>
+              <Icon as={FiShield} color="fg.accent" />
+              <Text fontSize="sm">Privacy Policy</Text>
+            </Link>
           </Menu.Item>
 
           {/* Terms */}
-          <Menu.Item value="terms" gap={2.5} rounded="lg">
-            <Icon as={FiFileText} color="fg.accent" />
-            <Text fontSize="sm">Terms of Use</Text>
+          <Menu.Item value="terms" gap={2.5} rounded="lg" asChild>
+            <Link href="/terms-of-use" style={{ textDecoration: "none" }}>
+              <Icon as={FiFileText} color="fg.accent" />
+              <Text fontSize="sm">Terms of Use</Text>
+            </Link>
           </Menu.Item>
 
           <Menu.Separator borderColor="border.subtle" />

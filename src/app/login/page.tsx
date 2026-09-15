@@ -14,6 +14,8 @@ import {
   Flex,
   Grid,
   Badge,
+  HStack,
+  Link,
 } from "@chakra-ui/react"
 import { GoogleButton } from "@/components/google-button"
 import { DevCredit } from "@/components/dev-credit"
@@ -190,6 +192,15 @@ export default function LoginPage() {
                   Episodic
                 </Text>
                 <DevCredit size="md" />
+                <HStack gap={3} fontSize="xs" color="fg.muted">
+                  <Link href="/privacy-policy" _hover={{ color: "fg" }} transition="color">
+                    Privacy Policy
+                  </Link>
+                  <Text as="span">·</Text>
+                  <Link href="/terms-of-use" _hover={{ color: "fg" }} transition="color">
+                    Terms of Use
+                  </Link>
+                </HStack>
               </VStack>
             </VStack>
           </Flex>
