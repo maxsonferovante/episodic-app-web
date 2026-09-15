@@ -59,11 +59,18 @@ export function ProfileDialog({
     <Dialog.Root open={open} onOpenChange={(details) => onOpenChange(details.open)}>
       <Portal>
         <Dialog.Backdrop backdropBlur="sm" bg="black/20" />
-        <Dialog.Positioner>
+        <Dialog.Positioner
+          position="fixed"
+          inset={0}
+          display="flex"
+          alignItems="center"
+          justifyContent="center"
+          p={{ base: 4, md: 6 }}
+        >
           <Dialog.Content
-            rounded="2xl"
+            w="full"
             maxW="sm"
-            mx={4}
+            rounded="2xl"
             p={6}
             shadow="modal"
             borderWidth="1px"

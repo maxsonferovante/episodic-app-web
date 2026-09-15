@@ -41,11 +41,18 @@ export function ConfirmDialog({
     >
       <Portal>
         <Dialog.Backdrop backdropBlur="sm" bg="black/20" />
-        <Dialog.Positioner>
+        <Dialog.Positioner
+          position="fixed"
+          inset={0}
+          display="flex"
+          alignItems="center"
+          justifyContent="center"
+          p={4}
+        >
           <Dialog.Content
             rounded="2xl"
             maxW="md"
-            mx={4}
+            w="full"
             p={6}
             shadow="modal"
             borderWidth="1px"
