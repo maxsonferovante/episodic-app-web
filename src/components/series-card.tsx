@@ -2,6 +2,7 @@
 
 import Link from "next/link"
 import {
+  Badge,
   Box,
   Flex,
   Text,
@@ -19,6 +20,7 @@ interface SeriesCardProps {
   name: string
   posterPath: string | null
   firstAirDate: string | null
+  status?: string | null
   accent?: string
   footerLeft?: React.ReactNode
   footerRight?: React.ReactNode
@@ -33,6 +35,7 @@ export function SeriesCard({
   name,
   posterPath,
   firstAirDate,
+  status,
   accent = "accent",
   footerLeft,
   footerRight,
@@ -84,10 +87,23 @@ export function SeriesCard({
         <Text fontWeight="semibold" fontSize="sm" color="fg" truncate>
           {name}
         </Text>
-        {firstAirDate && (
-          <Text fontSize="xs" color="fg.muted">
-            {firstAirDate.slice(0, 4)}
-          </Text>
+        {(firstAirDate || status) && (
+          <Flex align="center" gap={2}>
+            {firstAirDate && (
+              <Text fontSize="xs" color="fg.muted">
+                {firstAirDate.slice(0, 4)}
+              </Text>
+            )}
+            {status && (
+              <Badge
+                size="xs"
+                rounded="full"
+                colorPalette={status === "Ended" ? "gray" : "green"}
+              >
+                {status === "Ended" ? "Ended" : "Airing"}
+              </Badge>
+            )}
+          </Flex>
         )}
 
         {/* Action buttons */}

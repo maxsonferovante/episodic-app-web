@@ -66,6 +66,7 @@ export default function LibraryPage() {
                       name={item.name}
                       posterPath={item.posterPath}
                       firstAirDate={item.firstAirDate}
+                      status={item.status}
                       progress={item.percentage ?? 0}
                       footerLeft={
                         <Text fontSize="xs" color="fg.muted">

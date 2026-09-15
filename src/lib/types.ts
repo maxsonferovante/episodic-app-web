@@ -100,6 +100,7 @@ export interface LibraryItem {
   name: string
   posterPath: string | null
   firstAirDate: string | null
+  status?: string | null
   addedAt: string
   watchedEpisodes?: number
   totalEpisodes?: number
