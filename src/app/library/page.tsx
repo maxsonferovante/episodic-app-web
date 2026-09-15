@@ -66,6 +66,16 @@ export default function LibraryPage() {
                       name={item.name}
                       posterPath={item.posterPath}
                       firstAirDate={item.firstAirDate}
+                      footerLeft={
+                        <Text fontSize="xs" color="fg.muted">
+                          {item.watchedEpisodes ?? 0} of {item.totalEpisodes ?? 0} episodes watched
+                        </Text>
+                      }
+                      footerRight={
+                        <Text fontSize="xs" fontWeight="semibold" color="fg">
+                          {item.percentage ?? 0}%
+                        </Text>
+                      }
                     />
                   </Link>
                   <IconButton

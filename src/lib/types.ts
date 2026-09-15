@@ -95,6 +95,9 @@ export interface LibraryItem {
   posterPath: string | null
   firstAirDate: string | null
   addedAt: string
+  watchedEpisodes?: number
+  totalEpisodes?: number
+  percentage?: number
 }
 
 export interface SeriesProgress {
