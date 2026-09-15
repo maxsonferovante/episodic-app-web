@@ -1,0 +1,4 @@
+# Never upload local secrets to Vercel — env vars live in the project settings.
+.env
+.env.local
+.env.*.local

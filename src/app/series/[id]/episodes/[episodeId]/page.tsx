@@ -184,11 +184,12 @@ export default function EpisodeDetailPage() {
                   src={`${IMG_ORIGINAL}${episode.stillPath}`}
                   alt={episode.name}
                   w="full"
-                  h={{ base: 48, md: 64 }}
+                  aspectRatio={16 / 9}
                   objectFit="cover"
+                  objectPosition="center"
                 />
               ) : (
-                <Box w="full" h={48} bg="bg.muted" display="flex" alignItems="center" justifyContent="center">
+                <Box w="full" aspectRatio={16 / 9} bg="bg.muted" display="flex" alignItems="center" justifyContent="center">
                   <Icon as={FiFilm} boxSize={12} color="fg.muted" />
                 </Box>
               )}

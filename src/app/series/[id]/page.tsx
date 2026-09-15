@@ -179,14 +179,17 @@ export default function SeriesDetailPage() {
           <Stack gap={8}>
             {/* Banner + Poster */}
             <Box position="relative" rounded="2xl" overflow="hidden">
-              {series.backdropPath && (
+              {series.backdropPath ? (
                 <Image
                   src={`${IMG_ORIGINAL}${series.backdropPath}`}
                   alt=""
                   w="full"
-                  h={{ base: 56, md: 80 }}
+                  aspectRatio={16 / 9}
                   objectFit="cover"
+                  objectPosition="center"
                 />
+              ) : (
+                <Box w="full" aspectRatio={16 / 9} bg="bg.muted" />
               )}
               <Box
                 position="absolute"
@@ -282,7 +285,7 @@ export default function SeriesDetailPage() {
                 <Flex gap={3} flexWrap="wrap">
                   {series.providers.slice(0, 6).map((p) => (
                     <Flex key={p.providerId} gap={2} align="center" px={3} py={2} rounded="lg" borderWidth="1px" borderColor="border.subtle">
-                      {p.logoPath && <Image src={`${IMG_BASE}${p.logoPath}`} alt={p.providerName} boxSize={5} rounded="sm" />}
+                      {p.logoPath && <Image src={`${IMG_BASE}${p.logoPath}`} alt={p.providerName} boxSize={5} rounded="sm" objectFit="contain" />}
                       <Text fontSize="xs">{p.providerName}</Text>
                     </Flex>
                   ))}
@@ -417,7 +420,7 @@ export default function SeriesDetailPage() {
                                 src={`${IMG_BASE}${ep.stillPath}`}
                                 alt=""
                                 w={28}
-                                h={16}
+                                aspectRatio={16 / 9}
                                 rounded="md"
                                 objectFit="cover"
                                 flexShrink={0}

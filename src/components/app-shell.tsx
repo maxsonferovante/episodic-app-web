@@ -72,6 +72,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
                     alt="Episodic"
                     boxSize={8}
                     rounded="lg"
+                    objectFit="contain"
                   />
                   <Text fontSize="lg" fontWeight="bold" color="fg" letterSpacing="tight">
                     Episodic
