@@ -8,6 +8,7 @@ import {
   Image,
   Button,
   Icon,
+  Progress,
 } from "@chakra-ui/react"
 import { FiPlus, FiTrash2 } from "react-icons/fi"
 
@@ -21,6 +22,7 @@ interface SeriesCardProps {
   accent?: string
   footerLeft?: React.ReactNode
   footerRight?: React.ReactNode
+  progress?: number
   onAdd?: () => void
   onRemove?: () => void
   variant?: "library" | "search" | "dashboard"
@@ -34,6 +36,7 @@ export function SeriesCard({
   accent = "accent",
   footerLeft,
   footerRight,
+  progress,
   onAdd,
   onRemove,
   variant = "dashboard",
@@ -124,20 +127,32 @@ export function SeriesCard({
         )}
 
         {/* Footer */}
-        {(footerLeft || footerRight) && (
-          <Flex
-            mt="auto"
-            pt={2}
-            borderTopWidth="1px"
-            borderColor="border.subtle"
-            alignItems="center"
-            justifyContent="space-between"
-            fontSize="xs"
-            color="fg.muted"
-          >
-            <Box>{footerLeft}</Box>
-            <Box>{footerRight}</Box>
-          </Flex>
+        {(footerLeft || footerRight || typeof progress === "number") && (
+          <Box mt="auto" pt={2} borderTopWidth="1px" borderColor="border.subtle">
+            {typeof progress === "number" && (
+              <Progress.Root
+                value={progress}
+                size="xs"
+                rounded="full"
+                mb={footerLeft || footerRight ? 2 : 0}
+              >
+                <Progress.Track>
+                  <Progress.Range />
+                </Progress.Track>
+              </Progress.Root>
+            )}
+            {(footerLeft || footerRight) && (
+              <Flex
+                alignItems="center"
+                justifyContent="space-between"
+                fontSize="xs"
+                color="fg.muted"
+              >
+                <Box>{footerLeft}</Box>
+                <Box>{footerRight}</Box>
+              </Flex>
+            )}
+          </Box>
         )}
       </Box>
     </Box>
