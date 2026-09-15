@@ -52,7 +52,7 @@ export function GoogleIcon({ boxSize = 4 }: { boxSize?: number }) {
 export function GoogleButton({
   onSuccess,
   onError,
-  label = "Entrar com Conta Google",
+  label = "Continue with Google",
   size = "lg",
 }: GoogleButtonProps) {
   const height = size === "lg" ? 12 : 10

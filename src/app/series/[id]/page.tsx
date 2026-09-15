@@ -172,7 +172,7 @@ export default function SeriesDetailPage() {
         </Center>
       ) : !series ? (
         <Center minH="60vh">
-          <Text color="fg.muted">Série não encontrada</Text>
+          <Text color="fg.muted">Series not found</Text>
         </Center>
       ) : (
         <Container maxW="6xl" py={8} px={{ base: 4, md: 6 }}>
@@ -219,13 +219,13 @@ export default function SeriesDetailPage() {
                   <Flex gap={2} flexWrap="wrap">
                     {series.firstAirDate && <Badge colorPalette="gray">{series.firstAirDate.slice(0, 4)}</Badge>}
                     <Badge colorPalette={series.status === "Ended" ? "gray" : "green"}>
-                      {series.status === "Ended" ? "Encerrada" : "Em exibição"}
+                      {series.status === "Ended" ? "Ended" : "Airing"}
                     </Badge>
                     <Badge colorPalette="blue">
-                      {series.numberOfSeasons} temporada{series.numberOfSeasons > 1 ? "s" : ""}
+                      {series.numberOfSeasons} season{series.numberOfSeasons > 1 ? "s" : ""}
                     </Badge>
                     <Badge colorPalette="amber">
-                      {totalEpisodes} episódio{totalEpisodes !== 1 ? "s" : ""}
+                      {totalEpisodes} episode{totalEpisodes !== 1 ? "s" : ""}
                     </Badge>
                   </Flex>
                 </Stack>
@@ -239,7 +239,7 @@ export default function SeriesDetailPage() {
                   <Flex gap={2} alignItems="center">
                     <Icon as={FiTrendingUp} color="fg.accent" />
                     <Text fontSize="sm" fontWeight="semibold">
-                      {pct}% concluído
+                      {pct}% complete
                     </Text>
                   </Flex>
                   <Button
@@ -252,7 +252,7 @@ export default function SeriesDetailPage() {
                     loading={actionLoading}
                   >
                     <Icon as={inLibrary ? FiCheck : FiPlus} />
-                    {inLibrary ? "Na Biblioteca" : "Adicionar à Biblioteca"}
+                    {inLibrary ? "In Library" : "Add to Library"}
                   </Button>
                 </Flex>
                 <Progress.Root value={pct} size="sm" rounded="full">
@@ -261,7 +261,7 @@ export default function SeriesDetailPage() {
                   </Progress.Track>
                 </Progress.Root>
                 <Text fontSize="xs" color="fg.muted">
-                  {totalWatched} de {totalEpisodes} episódios assistidos
+                  {totalWatched} of {totalEpisodes} episodes watched
                 </Text>
               </Stack>
             </Box>
@@ -277,7 +277,7 @@ export default function SeriesDetailPage() {
             {series.providers && series.providers.length > 0 && (
               <Box>
                 <Heading size="sm" mb={3}>
-                  Onde Assistir
+                  Where to Watch
                 </Heading>
                 <Flex gap={3} flexWrap="wrap">
                   {series.providers.slice(0, 6).map((p) => (
@@ -293,10 +293,10 @@ export default function SeriesDetailPage() {
             {/* Season Tabs */}
             {series.seasons && series.seasons.length > 0 && (
               <Box>
-                {/* Segmented control de temporadas */}
+                {/* Seasons segmented control */}
                 <Box
                   role="tablist"
-                  aria-label="Temporadas"
+                  aria-label="Seasons"
                   display="flex"
                   gap={1}
                   p={1.5}
@@ -329,7 +329,7 @@ export default function SeriesDetailPage() {
                         _hover={{ color: "fg" }}
                         onClick={() => setSelectedSeason(s.seasonNumber)}
                       >
-                        {s.seasonNumber === 0 ? "Extras" : `T${s.seasonNumber}`}
+                        {s.seasonNumber === 0 ? "Specials" : `T${s.seasonNumber}`}
                         {prog && prog.total > 0 && (
                           <Text
                             as="span"
@@ -350,10 +350,10 @@ export default function SeriesDetailPage() {
                     <Box mt={3} mb={4}>
                       <Flex justifyContent="space-between" mb={1}>
                         <Text fontSize="xs" color="fg.muted">
-                          Progresso da Temporada
+                          Season progress
                         </Text>
                         <Text fontSize="xs" fontWeight="semibold">
-                          {seasonProgressMap[selectedSeason].watched}/{seasonProgressMap[selectedSeason].total} episódios
+                          {seasonProgressMap[selectedSeason].watched}/{seasonProgressMap[selectedSeason].total} episodes
                         </Text>
                       </Flex>
                       <Progress.Root
@@ -452,7 +452,7 @@ export default function SeriesDetailPage() {
                                     {ep.runtime}m
                                   </Flex>
                                 )}
-                                {isFuture && <Badge colorPalette="gray" size="xs">Em breve</Badge>}
+                                {isFuture && <Badge colorPalette="gray" size="xs">Coming soon</Badge>}
                               </Flex>
                             </Box>
 
@@ -481,7 +481,7 @@ export default function SeriesDetailPage() {
                     </Stack>
                   ) : (
                     <Center py={10}>
-                      <Text color="fg.muted">Nenhum episódio disponível</Text>
+                      <Text color="fg.muted">No episodes available</Text>
                     </Center>
                   )}
               </Box>

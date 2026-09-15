@@ -56,6 +56,7 @@ export function UserMenu({ onOpenProfile }: UserMenuProps) {
           transition="backgrounds, border-color"
         >
           <Avatar.Root size="sm">
+            <Avatar.Image src={user?.avatarUrl ?? undefined} alt={user?.name ?? ""} />
             <Avatar.Fallback name={user?.name} bg="bg.muted" fontWeight="bold">
               {initials}
             </Avatar.Fallback>

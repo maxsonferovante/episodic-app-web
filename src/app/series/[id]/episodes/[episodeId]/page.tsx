@@ -138,7 +138,7 @@ export default function EpisodeDetailPage() {
         </Center>
       ) : !episode || !series ? (
         <Center minH="60vh">
-          <Text color="fg.muted">Episódio não encontrado</Text>
+          <Text color="fg.muted">Episode not found</Text>
         </Center>
       ) : (
         <Container maxW="4xl" py={8} px={{ base: 4, md: 6 }}>
@@ -174,7 +174,7 @@ export default function EpisodeDetailPage() {
               gap={1}
             >
               <FiArrowLeft />
-              Voltar à série
+              Back to series
             </Button>
 
             {/* Episode Banner */}
@@ -215,13 +215,13 @@ export default function EpisodeDetailPage() {
                       <Badge colorPalette="green" size="sm">
                         <Flex gap={1} align="center">
                           <FiCheck />
-                          Assistido
+                          Watched
                         </Flex>
                       </Badge>
                     )}
                     {isFuture && (
                       <Badge colorPalette="gray" size="sm">
-                        Em breve
+                        Coming soon
                       </Badge>
                     )}
                   </Flex>
@@ -239,7 +239,7 @@ export default function EpisodeDetailPage() {
                   <Flex gap={2} alignItems="center">
                     <Icon as={isWatched ? FiCheck : FiPlay} color={isWatched ? "green.500" : "fg.accent"} />
                     <Text fontSize="sm" fontWeight="semibold">
-                      {isWatched ? "Assistido" : "Não assistido"}
+                      {isWatched ? "Watched" : "Not watched"}
                     </Text>
                   </Flex>
                   <Button
@@ -250,15 +250,15 @@ export default function EpisodeDetailPage() {
                     loading={actionLoading}
                   >
                     <Icon as={isWatched ? FiCheck : FiPlay} />
-                    {isWatched ? "Marcar como não assistido" : "Marcar como assistido"}
+                    {isWatched ? "Mark as unwatched" : "Mark as watched"}
                   </Button>
                 </Flex>
                 {watchedAt && isWatched && (
                   <Flex gap={2} alignItems="center">
                     <Icon as={FiCalendar} boxSize={3} color="fg.muted" />
                     <Text fontSize="xs" color="fg.muted">
-                      Assistido em{" "}
-                      {new Date(watchedAt).toLocaleDateString("pt-BR", {
+                      Watched on{" "}
+                      {new Date(watchedAt).toLocaleDateString("en-US", {
                         day: "2-digit",
                         month: "long",
                         year: "numeric",
@@ -282,13 +282,13 @@ export default function EpisodeDetailPage() {
                 {episode.airDate && (
                   <Flex gap={1.5} align="center">
                     <Icon as={FiCalendar} boxSize={4} />
-                    <Text>{new Date(episode.airDate).toLocaleDateString("pt-BR", { day: "2-digit", month: "long", year: "numeric" })}</Text>
+                    <Text>{new Date(episode.airDate).toLocaleDateString("en-US", { day: "2-digit", month: "long", year: "numeric" })}</Text>
                   </Flex>
                 )}
                 {episode.runtime && (
                   <Flex gap={1.5} align="center">
                     <Icon as={FiClock} boxSize={4} />
-                    <Text>{episode.runtime} minutos</Text>
+                    <Text>{episode.runtime} min</Text>
                   </Flex>
                 )}
                 {episode.voteAverage && (
@@ -309,7 +309,7 @@ export default function EpisodeDetailPage() {
                 >
                   <FiChevronLeft />
                   <Stack align="start" gap={0}>
-                    <Text fontSize="xs" color="fg.muted">Anterior</Text>
+                    <Text fontSize="xs" color="fg.muted">Previous</Text>
                     <Text fontSize="sm" fontWeight="semibold" truncate maxW="200px">
                       E{prevEpisode.episodeNumber} - {prevEpisode.name}
                     </Text>
@@ -328,7 +328,7 @@ export default function EpisodeDetailPage() {
                   justifyContent="flex-end"
                 >
                   <Stack align="end" gap={0}>
-                    <Text fontSize="xs" color="fg.muted">Próximo</Text>
+                    <Text fontSize="xs" color="fg.muted">Next</Text>
                     <Text fontSize="sm" fontWeight="semibold" truncate maxW="200px">
                       E{nextEpisode.episodeNumber} - {nextEpisode.name}
                     </Text>

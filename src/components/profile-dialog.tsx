@@ -77,14 +77,15 @@ export function ProfileDialog({
             borderColor="border.subtle"
           >
             <Stack align="center" textAlign="center" gap={4}>
-              <Dialog.Title srOnly>Perfil do usuário</Dialog.Title>
+              <Dialog.Title srOnly>User profile</Dialog.Title>
               <Dialog.Description srOnly>
-                Detalhes da conta autenticada.
+                Details of the signed-in account.
               </Dialog.Description>
 
               {/* Avatar */}
               <Box position="relative">
                 <Avatar.Root size="2xl" borderWidth="2px" borderColor="border.subtle" shadow="xs">
+                  <Avatar.Image src={user?.avatarUrl ?? undefined} alt={user?.name ?? ""} />
                   <Avatar.Fallback name={user?.name} bg="bg.muted" fontWeight="bold">
                     {initials}
                   </Avatar.Fallback>
@@ -129,7 +130,7 @@ export function ProfileDialog({
               >
                 <Flex align="center" gap={2.5} color="fg.muted">
                   <Icon as={FiBookOpen} boxSize={4} color="fg.accent" />
-                  <Text fontSize="xs">Séries na sua biblioteca</Text>
+                  <Text fontSize="xs">Series in your library</Text>
                 </Flex>
                 {libraryCount === null ? (
                   <Skeleton h={6} w={8} rounded="full" />
@@ -164,7 +165,7 @@ export function ProfileDialog({
                     }}
                   >
                     <Icon as={FiBookOpen} />
-                    Minha Biblioteca
+                    My Library
                   </Button>
                 )}
                 <Button
@@ -174,7 +175,7 @@ export function ProfileDialog({
                   borderColor="border.subtle"
                   onClick={() => onOpenChange(false)}
                 >
-                  Fechar
+                  Close
                 </Button>
               </Stack>
             </Stack>

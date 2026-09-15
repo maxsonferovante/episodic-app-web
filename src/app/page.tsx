@@ -68,7 +68,7 @@ export default function DashboardPage() {
             >
               <Box>
                 <Heading size="2xl" letterSpacing="tight">
-                  Olá!
+                  Welcome back!
                 </Heading>
                 <Text color="fg.muted" fontSize="sm" mt={1}>
                   Track your TV series, never lose your place.

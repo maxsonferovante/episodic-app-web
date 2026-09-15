@@ -21,12 +21,12 @@ import { FiTv, FiClock, FiBookOpen, FiStar, FiChevronDown } from "react-icons/fi
 
 const faqItems = [
   {
-    q: "Como funciona o tracking",
-    a: "Busque suas séries favoritas, adicione à biblioteca e marque episódios assistidos. O app calcula seu progresso e sugere o próximo episódio automaticamente.",
+    q: "How tracking works",
+    a: "Search for your favourite series, add them to your library and mark episodes as watched. The app computes your progress and suggests the next episode automatically.",
   },
   {
-    q: "Privacidade dos dados",
-    a: "Usamos Google OAuth apenas para identificar você e associar seu progresso. Não compartilhamos seus dados com terceiros.",
+    q: "Data privacy",
+    a: "We use Google OAuth only to identify you and associate your progress. We never share your data with third parties.",
   },
 ]
 
@@ -92,23 +92,23 @@ export default function LoginPage() {
         py={{ base: 12, md: 16 }}
         minH="100vh"
       >
-        {/* Cabeçalho (acima das duas colunas) */}
+        {/* Header (above both columns) */}
         <VStack align="start" gap={2}>
           <Heading size="3xl" letterSpacing="tight">
             Episodic
           </Heading>
           <Text color="fg.muted" fontSize="sm" fontWeight="medium">
-            Rastreie o progresso das suas séries de TV
+            Track your TV series progress
           </Text>
         </VStack>
 
-        {/* Colunas de altura igual — os dois cards alinham topo e base */}
+        {/* Equal-height columns — the two cards align top and bottom */}
         <Grid
           templateColumns={{ base: "1fr", md: "1fr 1fr" }}
           gap={{ base: 8, md: 10 }}
           alignItems="stretch"
         >
-          {/* Card de apresentação */}
+          {/* Presentation card */}
           <Box
             p={6}
             rounded="2xl"
@@ -121,14 +121,14 @@ export default function LoginPage() {
             flexDirection="column"
           >
             <Text fontSize="sm" fontWeight="semibold" mb={3}>
-              Seu catálogo pessoal de séries, organizado e sempre atualizado.
+              Your personal series catalogue, organised and always up to date.
             </Text>
             <VStack align="start" gap={3} mt={4}>
               {[
-                { icon: FiTv, text: "Busque qualquer série no catálogo" },
-                { icon: FiBookOpen, text: "Adicione à sua biblioteca pessoal" },
-                { icon: FiClock, text: "Marque episódios como assistidos" },
-                { icon: FiStar, text: "Acompanhe progresso por temporada e série" },
+                { icon: FiTv, text: "Search any series in the catalogue" },
+                { icon: FiBookOpen, text: "Add it to your personal library" },
+                { icon: FiClock, text: "Mark episodes as watched" },
+                { icon: FiStar, text: "Track progress per season and series" },
               ].map(({ icon, text }) => (
                 <Flex key={text} gap={2} align="center" fontSize="xs" color="fg.muted">
                   <Icon as={icon} color="fg.accent" />
@@ -144,7 +144,7 @@ export default function LoginPage() {
             </Box>
           </Box>
 
-          {/* Card de login */}
+          {/* Login card */}
           <Flex
             bg="bg"
             rounded="3xl"
@@ -167,9 +167,9 @@ export default function LoginPage() {
                 <Icon as={FiTv} boxSize={6} color="fg.accent" />
               </Center>
               <VStack gap={1}>
-                <Heading size="lg">Acessar o App</Heading>
+                <Heading size="lg">Sign in</Heading>
                 <Text fontSize="xs" color="fg.muted">
-                  Faça login com sua conta Google para continuar.
+                  Sign in with your Google account to continue.
                 </Text>
               </VStack>
               <Box w="full">
@@ -190,7 +190,7 @@ export default function LoginPage() {
             </VStack>
           </Flex>
 
-          {/* Badge sob a coluna esquerda */}
+          {/* Badge under the left column */}
           <Badge
             gridColumn={{ md: "1" }}
             justifySelf="flex-start"
@@ -199,7 +199,7 @@ export default function LoginPage() {
             variant="subtle"
             fontSize="xs"
           >
-            ✓ Biblioteca ilimitada · Progresso automático
+            ✓ Unlimited library · Automatic progress
           </Badge>
         </Grid>
       </Flex>
