@@ -194,7 +194,11 @@ export default function DashboardPage() {
                       _hover={{ shadow: "sm" }}
                       transition="all"
                       cursor="pointer"
-                      onClick={() => router.push(`/series/${item.series.id}`)}
+                      onClick={() =>
+                        router.push(
+                          `/series/${item.series.id}/episodes/${item.episode.seasonNumber}-${item.episode.episodeNumber}`,
+                        )
+                      }
                     >
                       <Box h={1} w="full" bg="accent.subtle" position="absolute" top={0} left={0} />
                       {item.series.posterPath && (
@@ -252,7 +256,11 @@ export default function DashboardPage() {
                       _hover={{ shadow: "sm" }}
                       transition="all"
                       cursor="pointer"
-                      onClick={() => router.push(`/series/${item.series.id}`)}
+                      onClick={() =>
+                        router.push(
+                          `/series/${item.series.id}/episodes/${item.episode.seasonNumber}-${item.episode.episodeNumber}`,
+                        )
+                      }
                     >
                       <Box flex={1}>
                         <Text fontWeight="semibold" fontSize="sm">
