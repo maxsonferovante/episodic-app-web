@@ -26,10 +26,8 @@ import {
   removeFromLibrary,
   setEpisodeProgress,
   setSeasonProgress,
-  getEpisodeProgress,
-  getLibrary,
 } from "@/lib/api"
-import type { SeriesDetailResponse, SeasonDetail as SeasonDetailType, LibraryItem, Episode } from "@/lib/types"
+import type { SeriesDetailResponse, SeasonDetail as SeasonDetailType, Episode } from "@/lib/types"
 import { WatchStatus } from "@/lib/constants"
 
 const IMG_BASE = "https://image.tmdb.org/t/p/w500"
@@ -60,13 +58,15 @@ export default function SeriesDetailPage() {
     (selectedSeasonMeta.episodeCount ?? 0) > 0 &&
     (selectedSeasonMeta.watchedEpisodes ?? 0) >= (selectedSeasonMeta.episodeCount ?? 0)
 
-  // Load series detail
+  // Load series detail. The backend computes watch progress and the caller's
+  // library membership, so no separate library fetch is needed.
   useEffect(() => {
     if (!seriesId) return
     setLoading(true)
     getSeriesDetail(seriesId)
       .then((data) => {
         setSeries(data)
+        setInLibrary(data.inLibrary ?? false)
         if (data.seasons && data.seasons.length > 0) {
           const firstReal = data.seasons.find((s) => s.seasonNumber > 0) || data.seasons[0]
           setSelectedSeason(firstReal.seasonNumber)
@@ -74,14 +74,6 @@ export default function SeriesDetailPage() {
       })
       .catch(() => {})
       .finally(() => setLoading(false))
-  }, [seriesId])
-
-  // Load library check separately (won't block page if 401)
-  useEffect(() => {
-    if (!seriesId) return
-    getLibrary()
-      .then((lib) => setInLibrary(Array.isArray(lib) ? lib.some((i: LibraryItem) => i.seriesId === seriesId || i.seriesId === `ser_${seriesId}`) : false))
-      .catch(() => setInLibrary(false))
   }, [seriesId])
 
   // Load the selected season's episodes (the backend returns each episode status).

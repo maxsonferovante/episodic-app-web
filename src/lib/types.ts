@@ -28,6 +28,8 @@ export interface SeriesSummary {
   name: string
   posterPath: string | null
   firstAirDate: string | null
+  /** True when the caller already has this series in their library. */
+  inLibrary?: boolean
 }
 
 export interface SeriesDetail extends SeriesSummary {

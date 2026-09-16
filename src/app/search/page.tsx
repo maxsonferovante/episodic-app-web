@@ -16,8 +16,8 @@ import {
 } from "@chakra-ui/react"
 import { ProtectedLayout } from "@/components/protected-layout"
 import { SeriesCard } from "@/components/series-card"
-import { searchSeries, addToLibrary, getLibrary, getDashboard } from "@/lib/api"
-import type { SeriesSummary, LibraryItem, HistoryItem } from "@/lib/types"
+import { searchSeries, addToLibrary, getDashboard } from "@/lib/api"
+import type { SeriesSummary, HistoryItem } from "@/lib/types"
 
 export default function SearchPage() {
   const router = useRouter()
@@ -28,16 +28,6 @@ export default function SearchPage() {
   const [totalPages, setTotalPages] = useState(0)
   const [libraryIds, setLibraryIds] = useState<Set<string>>(new Set())
   const [recentHistory, setRecentHistory] = useState<HistoryItem[]>([])
-
-  useEffect(() => {
-    getLibrary()
-      .then((data) => {
-        if (Array.isArray(data)) {
-          setLibraryIds(new Set(data.map((i: LibraryItem) => i.seriesId)))
-        }
-      })
-      .catch(() => {})
-  }, [])
 
   useEffect(() => {
     getDashboard()
@@ -101,7 +91,7 @@ export default function SearchPage() {
             <>
               <SimpleGrid columns={{ base: 2, sm: 3, md: 4, lg: 5 }} gap={4}>
                 {results.map((series) => {
-                  const inLibrary = libraryIds.has(series.id)
+                  const inLibrary = series.inLibrary || libraryIds.has(series.id)
                   return (
                     <SeriesCard
                       key={series.id}
