@@ -66,7 +66,7 @@ export default function EpisodeDetailPage() {
     getSeriesDetail(seriesId)
       .then(async (data) => {
         setSeries(data)
-        const realSeasons = data.seasons?.filter((s) => s.seasonNumber > 0) ?? []
+        const realSeasons = data.seasons ?? []
 
         const applyFound = (eps: Episode[], seasonNo: number, idx: number) => {
           setEpisode(eps[idx])
