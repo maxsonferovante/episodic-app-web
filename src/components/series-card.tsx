@@ -12,6 +12,7 @@ import {
   Progress,
 } from "@chakra-ui/react"
 import { FiPlus, FiTrash2 } from "react-icons/fi"
+import { SERIES_STATUS_META, type SeriesStatus } from "@/lib/constants"
 
 const IMG_BASE = "https://image.tmdb.org/t/p/w342"
 
@@ -44,6 +45,8 @@ export function SeriesCard({
   onRemove,
   variant = "dashboard",
 }: SeriesCardProps) {
+  const statusMeta = status ? SERIES_STATUS_META[status as SeriesStatus] : undefined
+
   const cardContent = (
     <Box
       rounded="2xl"
@@ -87,20 +90,16 @@ export function SeriesCard({
         <Text fontWeight="semibold" fontSize="sm" color="fg" truncate>
           {name}
         </Text>
-        {(firstAirDate || status) && (
+        {(firstAirDate || statusMeta) && (
           <Flex align="center" gap={2}>
             {firstAirDate && (
               <Text fontSize="xs" color="fg.muted">
                 {firstAirDate.slice(0, 4)}
               </Text>
             )}
-            {status && (
-              <Badge
-                size="xs"
-                rounded="full"
-                colorPalette={status === "Ended" ? "gray" : "green"}
-              >
-                {status === "Ended" ? "Ended" : "Airing"}
+            {statusMeta && (
+              <Badge size="xs" rounded="full" colorPalette={statusMeta.colorPalette}>
+                {statusMeta.label}
               </Badge>
             )}
           </Flex>
