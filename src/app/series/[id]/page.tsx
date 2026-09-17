@@ -77,8 +77,9 @@ export default function SeriesDetailPage() {
   }, [seriesId])
 
   // Load the selected season's episodes (the backend returns each episode status).
+  // NOTE: season 0 is "Specials", so the guard must not treat 0 as empty.
   useEffect(() => {
-    if (!seriesId || !selectedSeason) return
+    if (!seriesId || selectedSeason === null || selectedSeason === undefined) return
     setSeasonLoading(true)
     getSeasonDetail(seriesId, selectedSeason)
       .then(setSeasonData)
