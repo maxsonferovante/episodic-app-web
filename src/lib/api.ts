@@ -17,6 +17,49 @@ const BASE_URL = process.env.NEXT_PUBLIC_API_URL || ""
 
 const ACCESS_KEY = "episodic_access_token"
 const REFRESH_KEY = "episodic_refresh_token"
+export const USER_KEY = "episodic_user"
+
+/**
+ * Session middleware (transparent to callers):
+ *
+ * - Every `request()` goes through here. On 401 the access token is
+ *   refreshed and the original call retried once.
+ * - Concurrent 401s share a single in-flight refresh (single-flight), so a
+ *   page firing N parallel calls costs exactly one `POST /auth/refresh`
+ *   instead of N — friendlier to the API Gateway throttle.
+ * - A proactive timer renews the access token ~5min before it expires, so
+ *   returning users usually never hit the 401 path at all.
+ * - When renewal is impossible (no/expired refresh token), the session is
+ *   torn down and the registered `onSessionExpired` handler fires once
+ *   (the auth provider uses it to redirect to `/login?expired=1`).
+ */
+type SessionExpiredHandler = () => void
+let sessionExpiredHandler: SessionExpiredHandler | null = null
+let sessionExpiredNotified = false
+let inflightRefresh: Promise<string | null> | null = null
+let proactiveTimer: ReturnType<typeof setTimeout> | null = null
+
+/** Proactive renewal margin before the access token `exp`. */
+const PROACTIVE_REFRESH_MARGIN_MS = 5 * 60 * 1000
+
+export function setSessionExpiredHandler(fn: SessionExpiredHandler | null) {
+  sessionExpiredHandler = fn
+  if (fn === null) sessionExpiredNotified = false
+}
+
+function notifySessionExpired() {
+  if (sessionExpiredNotified) return
+  sessionExpiredNotified = true
+  // Only redirect when there was a session to lose. A visitor that was
+  // never logged in has no refresh token and no stored user — the
+  // ProtectedLayout already sends them to /login without the flag.
+  const hadSession =
+    typeof window !== "undefined" &&
+    (localStorage.getItem(REFRESH_KEY) !== null ||
+      localStorage.getItem(USER_KEY) !== null)
+  clearTokens()
+  if (hadSession) sessionExpiredHandler?.()
+}
 
 function getStoredAccess(): string | null {
   if (typeof window === "undefined") return null
@@ -33,15 +76,18 @@ let refreshToken: string | null = null
 export function setTokens(access: string, refresh: string) {
   accessToken = access
   refreshToken = refresh
+  sessionExpiredNotified = false
   if (typeof window !== "undefined") {
     localStorage.setItem(ACCESS_KEY, access)
     localStorage.setItem(REFRESH_KEY, refresh)
   }
+  scheduleProactiveRefresh()
 }
 
 export function clearTokens() {
   accessToken = null
   refreshToken = null
+  cancelProactiveRefresh()
   if (typeof window !== "undefined") {
     localStorage.removeItem(ACCESS_KEY)
     localStorage.removeItem(REFRESH_KEY)
@@ -53,6 +99,17 @@ export function getAccessToken() {
 }
 
 async function refreshAccessToken(): Promise<string | null> {
+  // Single-flight: concurrent callers share the same renewal.
+  if (inflightRefresh) return inflightRefresh
+  inflightRefresh = doRefresh()
+  try {
+    return await inflightRefresh
+  } finally {
+    inflightRefresh = null
+  }
+}
+
+async function doRefresh(): Promise<string | null> {
   const currentRefresh = refreshToken || getStoredRefresh()
   if (!currentRefresh) return null
   try {
@@ -68,10 +125,60 @@ async function refreshAccessToken(): Promise<string | null> {
     if (typeof window !== "undefined") {
       localStorage.setItem(ACCESS_KEY, data.accessToken)
     }
+    scheduleProactiveRefresh()
     return data.accessToken
   } catch {
     return null
   }
+}
+
+/** Read the `exp` claim of a JWT without verifying it (timing only). */
+function parseJwtExpMs(token: string): number | null {
+  try {
+    const payload = token.split(".")[1]
+    if (!payload) return null
+    const json = JSON.parse(
+      atob(payload.replace(/-/g, "+").replace(/_/g, "/")),
+    ) as { exp?: unknown }
+    return typeof json.exp === "number" ? json.exp * 1000 : null
+  } catch {
+    return null
+  }
+}
+
+function cancelProactiveRefresh() {
+  if (proactiveTimer !== null) {
+    clearTimeout(proactiveTimer)
+    proactiveTimer = null
+  }
+}
+
+/**
+ * Renew the access token shortly before it expires. If it is already
+ * expired (e.g. the tab was idle for hours), renew immediately so the next
+ * user action finds a valid session. Failures surface through the same
+ * expired-session path as a failed 401 retry.
+ */
+function scheduleProactiveRefresh() {
+  cancelProactiveRefresh()
+  if (typeof window === "undefined") return
+  const token = accessToken || getStoredAccess()
+  if (!token) return
+  const expMs = parseJwtExpMs(token)
+  if (expMs === null) return
+  const delay = expMs - Date.now() - PROACTIVE_REFRESH_MARGIN_MS
+  if (delay <= 0) {
+    void refreshAccessToken().then((t) => {
+      if (!t) notifySessionExpired()
+    })
+    return
+  }
+  proactiveTimer = setTimeout(() => {
+    proactiveTimer = null
+    void refreshAccessToken().then((t) => {
+      if (!t) notifySessionExpired()
+    })
+  }, delay)
 }
 
 async function request<T>(
@@ -97,11 +204,15 @@ async function request<T>(
 
   let res = await fetch(`${BASE_URL}${path}`, { ...options, headers })
 
-  if (res.status === 401 && refreshToken) {
+  // Auth endpoints manage their own failures; never loop them into the
+  // expired-session flow (the refresh call itself uses raw fetch anyway).
+  if (res.status === 401 && !path.startsWith("/api/v1/auth")) {
     const newToken = await refreshAccessToken()
     if (newToken) {
       headers.set("Authorization", `Bearer ${newToken}`)
       res = await fetch(`${BASE_URL}${path}`, { ...options, headers })
+    } else {
+      notifySessionExpired()
     }
   }
 

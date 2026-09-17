@@ -1,7 +1,7 @@
 "use client"
 
-import { useRouter } from "next/navigation"
-import { useEffect, useState } from "react"
+import { useRouter, useSearchParams } from "next/navigation"
+import { useEffect, useState, Suspense } from "react"
 import {
   Box,
   Center,
@@ -20,7 +20,7 @@ import {
 import { GoogleButton } from "@/components/google-button"
 import { DevCredit } from "@/components/dev-credit"
 import { useAuth } from "@/contexts/auth-context"
-import { FiTv, FiClock, FiBookOpen, FiStar, FiChevronDown } from "react-icons/fi"
+import { FiTv, FiClock, FiBookOpen, FiStar, FiChevronDown, FiAlertCircle } from "react-icons/fi"
 
 const faqItems = [
   {
@@ -60,6 +60,29 @@ function FaqItem({ q, a }: { q: string; a: string }) {
         </Text>
       )}
     </Box>
+  )
+}
+
+/** Shown when the session middleware redirected here after a failed renewal. */
+function ExpiredNotice() {
+  const params = useSearchParams()
+  if (params.get("expired") !== "1") return null
+  return (
+    <Flex
+      w="full"
+      gap={2}
+      align="center"
+      p={3}
+      rounded="lg"
+      bg="amber.50"
+      borderWidth="1px"
+      borderColor="amber.200"
+    >
+      <Icon as={FiAlertCircle} color="amber.600" flexShrink={0} />
+      <Text fontSize="xs" fontWeight="semibold" color="amber.800">
+        Your session has expired. Sign in again to see your data.
+      </Text>
+    </Flex>
   )
 }
 
@@ -175,6 +198,9 @@ export default function LoginPage() {
                   Sign in with your Google account to continue.
                 </Text>
               </VStack>
+              <Suspense fallback={null}>
+                <ExpiredNotice />
+              </Suspense>
               <Box w="full">
                 <GoogleButton
                   onSuccess={(credential) => {
