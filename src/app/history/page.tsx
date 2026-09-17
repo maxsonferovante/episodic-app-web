@@ -20,6 +20,16 @@ import { getHistory } from "@/lib/api"
 import type { HistoryItem } from "@/lib/types"
 
 const MARK_WATCHED = "MARK_WATCHED"
+const INVALID_CURSOR = "INVALID_CURSOR"
+
+/** Backend nests the code under `error`; be liberal in what we accept. */
+function isInvalidCursor(e: unknown): boolean {
+  if (typeof e !== "object" || e === null) return false
+  const root = e as { code?: unknown; error?: unknown }
+  if (root.code === INVALID_CURSOR) return true
+  const nested = root.error as { code?: unknown } | undefined
+  return nested?.code === INVALID_CURSOR
+}
 
 export default function HistoryPage() {
   const router = useRouter()
@@ -38,8 +48,21 @@ export default function HistoryPage() {
       setItems((prev) => [...prev, ...data.items])
       setCursor(data.nextCursor)
       setHasMore(!!data.nextCursor)
-    } catch {
-      setHasMore(false)
+    } catch (e) {
+      if (isInvalidCursor(e) && cursor) {
+        // Cursor key rotated (or a stale token): restart from page one once
+        // instead of dead-ending the infinite scroll.
+        try {
+          const data = await getHistory(undefined)
+          setItems(data.items)
+          setCursor(data.nextCursor)
+          setHasMore(!!data.nextCursor)
+        } catch {
+          setHasMore(false)
+        }
+      } else {
+        setHasMore(false)
+      }
     } finally {
       setLoadingMore(false)
     }
