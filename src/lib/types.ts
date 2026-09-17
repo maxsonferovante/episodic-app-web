@@ -172,6 +172,10 @@ export interface ProgressResponse {
   progress: {
     seriesPercentage: number
     seasonPercentage: number
+    watchedEpisodes: number
+    totalEpisodes: number
+    seasonWatchedEpisodes: number
+    seasonTotalEpisodes: number
   }
   nextEpisode: {
     episodeId: string

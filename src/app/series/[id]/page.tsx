@@ -105,27 +105,47 @@ export default function SeriesDetailPage() {
     }
   }
 
-  // Re-read the backend-computed progress (series + the given season).
-  const refreshAfterChange = useCallback(
-    async (seasonNumber: number) => {
-      const [seriesData, season] = await Promise.all([
-        getSeriesDetail(seriesId).catch(() => null),
-        getSeasonDetail(seriesId, seasonNumber).catch(() => null),
-      ])
-      if (seriesData) setSeries(seriesData)
-      if (season) setSeasonData(season)
-    },
-    [seriesId],
-  )
-
+  // Watch toggles apply their PUT responses locally (authoritative totals
+  // included), so each action costs a single request instead of refetching.
   const handleToggleEpisode = useCallback(
     async (episodeId: string, currentStatus?: string) => {
       try {
-        await setEpisodeProgress(episodeId, currentStatus !== WatchStatus.WATCHED)
-        await refreshAfterChange(selectedSeason)
+        const res = await setEpisodeProgress(episodeId, currentStatus !== WatchStatus.WATCHED)
+        const p = res.progress
+        const percentage =
+          p.totalEpisodes > 0
+            ? Math.min(100, Math.round((p.watchedEpisodes / p.totalEpisodes) * 100))
+            : 0
+        setSeasonData((prev) =>
+          prev
+            ? {
+                ...prev,
+                episodes: prev.episodes.map((ep) =>
+                  ep.id === episodeId ? { ...ep, status: res.episode.status } : ep,
+                ),
+              }
+            : prev,
+        )
+        setSeries((prev) =>
+          prev
+            ? {
+                ...prev,
+                progress: {
+                  watchedEpisodes: p.watchedEpisodes,
+                  totalEpisodes: p.totalEpisodes,
+                  percentage,
+                },
+                seasons: prev.seasons.map((s) =>
+                  s.seasonNumber === selectedSeason
+                    ? { ...s, watchedEpisodes: p.seasonWatchedEpisodes }
+                    : s,
+                ),
+              }
+            : prev,
+        )
       } catch {}
     },
-    [refreshAfterChange, selectedSeason],
+    [selectedSeason],
   )
 
   const handleToggleSeason = useCallback(
@@ -135,14 +155,48 @@ export default function SeriesDetailPage() {
       const markWatched = (meta.watchedEpisodes ?? 0) < (meta.episodeCount ?? 0)
       setSeasonActionLoading(true)
       try {
-        await setSeasonProgress(seriesId, seasonNumber, markWatched)
-        await refreshAfterChange(seasonNumber)
+        const res = await setSeasonProgress(seriesId, seasonNumber, markWatched)
+        const marked = new Set(res.updatedEpisodeNumbers)
+        // Flip exactly the episodes the backend (un)marked (aired only),
+        // and apply the authoritative totals — no refetch needed.
+        setSeasonData((prev) =>
+          prev && prev.seasonNumber === seasonNumber
+            ? {
+                ...prev,
+                episodes: prev.episodes.map((ep) =>
+                  marked.has(ep.episodeNumber)
+                    ? {
+                        ...ep,
+                        status: markWatched ? WatchStatus.WATCHED : WatchStatus.UNWATCHED,
+                      }
+                    : ep,
+                ),
+              }
+            : prev,
+        )
+        setSeries((prev) =>
+          prev
+            ? {
+                ...prev,
+                progress: {
+                  watchedEpisodes: res.progress.watchedEpisodes,
+                  totalEpisodes: res.progress.totalEpisodes,
+                  percentage: res.progress.percentage,
+                },
+                seasons: prev.seasons.map((s) =>
+                  s.seasonNumber === seasonNumber
+                    ? { ...s, watchedEpisodes: res.season.watchedEpisodes }
+                    : s,
+                ),
+              }
+            : prev,
+        )
       } catch {}
       finally {
         setSeasonActionLoading(false)
       }
     },
-    [series, seriesId, refreshAfterChange],
+    [series, seriesId],
   )
 
   const handleEpisodeClick = (episode: Episode) => {

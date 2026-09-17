@@ -355,6 +355,18 @@ export interface SeasonProgressResult {
   seasonNumber: number
   watched: boolean
   updatedEpisodes: number
+  /** Episode numbers actually (un)marked (aired only) — flip exactly these. */
+  updatedEpisodeNumbers: number[]
+  progress: {
+    watchedEpisodes: number
+    totalEpisodes: number
+    percentage: number
+  }
+  season: {
+    seasonNumber: number
+    watchedEpisodes: number
+    episodeCount: number
+  }
 }
 
 /** Mark/unmark every episode of a season in a single request. */
