@@ -11,6 +11,7 @@ import type {
   HistoryResponse,
   ProgressResponse,
   CalendarResponse,
+  ReleasesResponse,
 } from "./types"
 
 const BASE_URL = process.env.NEXT_PUBLIC_API_URL || ""
@@ -389,4 +390,22 @@ export async function getCalendar(
   to: string,
 ): Promise<CalendarResponse> {
   return request(`/api/v1/calendar?from=${from}&to=${to}`)
+}
+
+/**
+ * Release calendar: every episode from the user's library series airing in
+ * `[from, to)`. Powers the Upcoming view modes (week / month / 3 months /
+ * specific month). Each item carries the English weekday of its air date.
+ */
+export async function getReleases(
+  from: string,
+  to: string,
+): Promise<ReleasesResponse> {
+  return request(`/api/v1/releases?from=${from}&to=${to}`)
+}
+
+export async function getReleasesByMonth(
+  month: string,
+): Promise<ReleasesResponse> {
+  return request(`/api/v1/releases?month=${month}`)
 }

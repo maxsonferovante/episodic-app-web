@@ -139,6 +139,14 @@ export interface UpcomingItem {
   series: SeriesSummary
   episode: { seasonNumber: number; episodeNumber: number; name: string }
   airDate: string
+  /** English weekday name ("Monday".."Sunday"), provided by the API. */
+  weekday: string
+}
+
+export interface ReleasesResponse {
+  from: string
+  to: string
+  items: UpcomingItem[]
 }
 
 export interface HistoryItem {
