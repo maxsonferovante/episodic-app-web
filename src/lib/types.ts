@@ -158,6 +158,8 @@ export interface HistoryItem {
   }
   series: SeriesSummary
   watchedAt: string
+  /** What happened: MARK_WATCHED or UNMARK_WATCHED. */
+  eventType: string
 }
 
 export interface DashboardResponse {

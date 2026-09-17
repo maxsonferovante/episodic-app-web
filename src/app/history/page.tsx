@@ -1,6 +1,7 @@
 "use client"
 
 import { useCallback, useEffect, useRef, useState } from "react"
+import { useRouter } from "next/navigation"
 import {
   Box,
   Container,
@@ -9,12 +10,19 @@ import {
   Stack,
   Text,
   Center,
+  Badge,
+  Flex,
+  Icon,
 } from "@chakra-ui/react"
+import { FiCheck, FiX, FiChevronRight } from "react-icons/fi"
 import { ProtectedLayout } from "@/components/protected-layout"
 import { getHistory } from "@/lib/api"
 import type { HistoryItem } from "@/lib/types"
 
+const MARK_WATCHED = "MARK_WATCHED"
+
 export default function HistoryPage() {
+  const router = useRouter()
   const [items, setItems] = useState<HistoryItem[]>([])
   const [loading, setLoading] = useState(true)
   const [loadingMore, setLoadingMore] = useState(false)
@@ -78,35 +86,59 @@ export default function HistoryPage() {
             </Box>
           ) : (
             <Stack gap={3}>
-              {items.map((item, i) => (
-                <Box
-                  key={`${item.episode.id}-${i}`}
-                  p={4}
-                  rounded="lg"
-                  borderWidth="1px"
-                  borderColor="border.subtle"
-                  display="flex"
-                  alignItems="center"
-                  gap={4}
-                >
-                  <Box flex={1}>
-                    <Text fontWeight="medium" fontSize="sm">
-                      {item.series.name}
+              {items.map((item, i) => {
+                const marked = item.eventType === MARK_WATCHED
+                return (
+                  <Box
+                    key={`${item.episode.id}-${i}`}
+                    p={4}
+                    rounded="lg"
+                    borderWidth="1px"
+                    borderColor="border.subtle"
+                    display="flex"
+                    alignItems="center"
+                    gap={4}
+                    cursor="pointer"
+                    _hover={{ shadow: "sm" }}
+                    transition="all"
+                    onClick={() =>
+                      router.push(
+                        `/series/${item.series.id}/episodes/${item.episode.seasonNumber}-${item.episode.episodeNumber}`,
+                      )
+                    }
+                  >
+                    <Box flex={1}>
+                      <Flex alignItems="center" gap={2}>
+                        <Text fontWeight="medium" fontSize="sm">
+                          {item.series.name}
+                        </Text>
+                        <Badge
+                          colorPalette={marked ? "green" : "gray"}
+                          size="xs"
+                          variant="subtle"
+                        >
+                          <Flex gap={1} align="center">
+                            <Icon as={marked ? FiCheck : FiX} boxSize={3} />
+                            {marked ? "Watched" : "Unwatched"}
+                          </Flex>
+                        </Badge>
+                      </Flex>
+                      <Text fontSize="xs" color="fg.muted">
+                        S{item.episode.seasonNumber}E{item.episode.episodeNumber}
+                        {item.episode.name ? ` - ${item.episode.name}` : ""}
+                      </Text>
+                    </Box>
+                    <Text fontSize="xs" color="fg.muted" whiteSpace="nowrap">
+                      {new Date(item.watchedAt).toLocaleDateString()}{" "}
+                      {new Date(item.watchedAt).toLocaleTimeString([], {
+                        hour: "2-digit",
+                        minute: "2-digit",
+                      })}
                     </Text>
-                    <Text fontSize="xs" color="fg.muted">
-                      S{item.episode.seasonNumber}E{item.episode.episodeNumber}
-                      {item.episode.name ? ` - ${item.episode.name}` : ""}
-                    </Text>
+                    <Icon as={FiChevronRight} color="fg.muted" flexShrink={0} />
                   </Box>
-                  <Text fontSize="xs" color="fg.muted" whiteSpace="nowrap">
-                    {new Date(item.watchedAt).toLocaleDateString()}{" "}
-                    {new Date(item.watchedAt).toLocaleTimeString([], {
-                      hour: "2-digit",
-                      minute: "2-digit",
-                    })}
-                  </Text>
-                </Box>
-              ))}
+                )
+              })}
               <div ref={sentinelRef} />
               {loadingMore && (
                 <Center py={4}>
