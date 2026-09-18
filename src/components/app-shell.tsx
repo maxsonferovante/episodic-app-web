@@ -39,13 +39,10 @@ export function AppShell({ children }: { children: React.ReactNode }) {
         position="sticky"
         top={0}
         zIndex={40}
-        borderBottomWidth="1px"
-        borderColor="border.subtle"
+        borderBottomWidth="3px"
+        borderColor="border"
       >
-        {/* Accent bar */}
-        <Box h={1} w="full" bg="accent.subtle" />
-
-        <Box bg="bg.subtle/80" backdropBlur="md">
+        <Box bg="bg.subtle">
           <Flex
             maxW="7xl"
             mx="auto"
@@ -75,8 +72,9 @@ export function AppShell({ children }: { children: React.ReactNode }) {
                     rounded="lg"
                     objectFit="contain"
                   />
-                  <Text fontSize="lg" fontWeight="bold" color="fg" letterSpacing="tight">
-                    Episodic
+                  <Text fontSize="lg" fontWeight="bold" letterSpacing="tight">
+                    <Text as="span" color="fg">Epi</Text>
+                    <Text as="span" color="accent">sodic</Text>
                   </Text>
                 </HStack>
               </Link>
@@ -99,10 +97,18 @@ export function AppShell({ children }: { children: React.ReactNode }) {
                         px={3}
                         py={2}
                         rounded="md"
+                        fontWeight={isActive ? "bold" : "medium"}
                         color={isActive ? "fg" : "fg.muted"}
                         bg={isActive ? "bg.muted" : "transparent"}
+                        borderWidth="2.5px"
+                        borderColor={isActive ? "border" : "transparent"}
+                        boxShadow={
+                          isActive
+                            ? "2px 2px 0 0 var(--chakra-colors-border)"
+                            : "none"
+                        }
                         _hover={{ bg: "bg.muted", color: "fg" }}
-                        transition="backgrounds"
+                        transition="backgrounds, box-shadow 100ms ease"
                       >
                         <NavIcon size={16} />
                         <Text fontSize="sm" fontWeight={isActive ? "semibold" : "normal"}>
@@ -123,8 +129,8 @@ export function AppShell({ children }: { children: React.ReactNode }) {
         {/* Mobile Menu */}
         {isMobile && mobileOpen && (
           <Box
-            borderTopWidth="1px"
-            borderColor="border.subtle"
+            borderTopWidth="2.5px"
+            borderColor="border"
             bg="bg.subtle"
             px={4}
             py={3}
@@ -144,8 +150,16 @@ export function AppShell({ children }: { children: React.ReactNode }) {
                     px={3}
                     py={3}
                     rounded="md"
+                    fontWeight={isActive ? "bold" : "medium"}
                     color={isActive ? "fg" : "fg.muted"}
                     bg={isActive ? "bg.muted" : "transparent"}
+                    borderWidth="2.5px"
+                    borderColor={isActive ? "border" : "transparent"}
+                    boxShadow={
+                      isActive
+                        ? "2px 2px 0 0 var(--chakra-colors-border)"
+                        : "none"
+                    }
                     _hover={{ bg: "bg.muted", color: "fg" }}
                   >
                     <NavIcon size={18} />
@@ -166,8 +180,8 @@ export function AppShell({ children }: { children: React.ReactNode }) {
       <Box
         as="footer"
         bg="bg.muted"
-        borderTopWidth="1px"
-        borderColor="border.subtle"
+        borderTopWidth="3px"
+        borderColor="border"
         py={4}
         px={6}
       >
