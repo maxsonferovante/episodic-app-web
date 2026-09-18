@@ -1,7 +1,14 @@
 <svg width="512" height="512" viewBox="0 0 512 512" fill="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Episodic">
   <title>Episodic</title>
-  <rect width="512" height="512" rx="112" fill="#171717"/>
-  <path d="M216 164L336 233L216 302Z" fill="#FFFFFF" stroke="#FFFFFF" stroke-width="30" stroke-linejoin="round"/>
-  <rect x="150" y="372" width="212" height="20" rx="10" fill="#FFFFFF" fill-opacity="0.18"/>
-  <rect x="150" y="372" width="132" height="20" rx="10" fill="#0090FF"/>
+  <!-- cream canvas -->
+  <rect width="512" height="512" rx="112" fill="#FFFDF8"/>
+  <!-- hard offset shadow -->
+  <rect x="98" y="98" width="360" height="360" rx="84" fill="#18181B"/>
+  <!-- ink-bordered tile -->
+  <rect x="70" y="70" width="360" height="360" rx="84" fill="#FFFDF8" stroke="#18181B" stroke-width="30"/>
+  <!-- play glyph -->
+  <path d="M208 156L208 296L332 226Z" fill="#D31611" stroke="#18181B" stroke-width="26" stroke-linejoin="round"/>
+  <!-- watch progress -->
+  <rect x="170" y="328" width="160" height="40" rx="20" fill="#FFF4DA" stroke="#18181B" stroke-width="18"/>
+  <rect x="180" y="338" width="96" height="20" rx="10" fill="#D31611"/>
 </svg>
