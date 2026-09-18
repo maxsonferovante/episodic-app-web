@@ -17,7 +17,7 @@ export function GoogleButton({ onSuccess, onError }: GoogleButtonProps) {
   return (
     <Box w="full" display="flex" justifyContent="center">
       <GoogleLogin
-        shape="pill"
+        shape="rectangular"
         theme="outline"
         size="large"
         text="continue_with"

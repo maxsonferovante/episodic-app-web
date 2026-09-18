@@ -30,10 +30,9 @@ export function LegalLayout({ title, updatedAt, children }: LegalLayoutProps) {
         position="sticky"
         top={0}
         zIndex={40}
-        borderBottomWidth="1px"
-        borderColor="border.subtle"
-        bg="bg.subtle/80"
-        backdropBlur="md"
+        borderBottomWidth="3px"
+        borderColor="border"
+        bg="bg.subtle"
       >
         <Flex
           maxW="3xl"
@@ -52,8 +51,9 @@ export function LegalLayout({ title, updatedAt, children }: LegalLayoutProps) {
                 rounded="lg"
                 objectFit="contain"
               />
-              <Text fontSize="lg" fontWeight="bold" color="fg" letterSpacing="tight">
-                Episodic
+              <Text fontSize="lg" fontWeight="bold" letterSpacing="tight">
+                <Text as="span" color="fg">Epi</Text>
+                <Text as="span" color="accent">sodic</Text>
               </Text>
             </HStack>
           </Link>
@@ -68,23 +68,32 @@ export function LegalLayout({ title, updatedAt, children }: LegalLayoutProps) {
 
       <Box as="main" flex={1} py={{ base: 8, md: 14 }} px={{ base: 4, md: 6 }}>
         <Container maxW="3xl" px={0}>
-          <Heading size="2xl" letterSpacing="tight" mb={1}>
-            {title}
-          </Heading>
-          <Text fontSize="sm" color="fg.muted" mb={8}>
-            Last updated: {updatedAt}
-          </Text>
-          <VStack align="stretch" gap={7}>
-            {children}
-          </VStack>
+          <Box
+            borderWidth="2.5px"
+            borderColor="border"
+            rounded="xl"
+            bg="bg"
+            boxShadow="4px 4px 0 0 var(--chakra-colors-border)"
+            p={{ base: 5, md: 8 }}
+          >
+            <Heading size="2xl" letterSpacing="tight" mb={1}>
+              {title}
+            </Heading>
+            <Text fontSize="sm" color="fg.muted" mb={8}>
+              Last updated: {updatedAt}
+            </Text>
+            <VStack align="stretch" gap={7}>
+              {children}
+            </VStack>
+          </Box>
         </Container>
       </Box>
 
       <Box
         as="footer"
         bg="bg.muted"
-        borderTopWidth="1px"
-        borderColor="border.subtle"
+        borderTopWidth="3px"
+        borderColor="border"
         py={4}
         px={6}
       >

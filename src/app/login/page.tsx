@@ -121,7 +121,8 @@ export default function LoginPage() {
         {/* Header (above both columns) */}
         <VStack align="start" gap={2}>
           <Heading size="3xl" letterSpacing="tight">
-            Episodic
+            <Text as="span" color="fg">Epi</Text>
+            <Text as="span" color="accent">sodic</Text>
           </Heading>
           <Text color="fg.muted" fontSize="sm" fontWeight="medium">
             Track your TV series progress
@@ -137,11 +138,11 @@ export default function LoginPage() {
           {/* Presentation card */}
           <Box
             p={6}
-            rounded="2xl"
-            borderWidth="1px"
-            borderColor="border.subtle"
+            rounded="xl"
+            borderWidth="2.5px"
+            borderColor="border"
             bg="bg"
-            shadow="sm"
+            boxShadow="3px 3px 0 0 var(--chakra-colors-border)"
             h="full"
             display="flex"
             flexDirection="column"
@@ -173,10 +174,10 @@ export default function LoginPage() {
           {/* Login card */}
           <Flex
             bg="bg"
-            rounded="3xl"
-            shadow="lg"
-            borderWidth="1px"
-            borderColor="border.subtle"
+            rounded="xl"
+            boxShadow="4px 4px 0 0 var(--chakra-colors-border)"
+            borderWidth="2.5px"
+            borderColor="border"
             overflow="hidden"
             direction="column"
             h="full"
@@ -188,6 +189,8 @@ export default function LoginPage() {
                 h={14}
                 rounded="full"
                 bg="bg.muted"
+                borderWidth="2.5px"
+                borderColor="border"
                 shadow="sm"
               >
                 <Icon as={FiTv} boxSize={6} color="fg.accent" />

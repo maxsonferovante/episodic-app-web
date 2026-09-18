@@ -17,6 +17,10 @@ export function LibraryStatusFilter({ value, onChange, counts }: LibraryStatusFi
         aria-label="Filter by series status"
         value={value}
         onChange={(e) => onChange(e.currentTarget.value)}
+        borderWidth="2.5px"
+        borderColor="border"
+        bg="bg"
+        fontWeight="semibold"
       >
         {SERIES_STATUS_FILTERS.map((option) => (
           <option key={option.value} value={option.value}>

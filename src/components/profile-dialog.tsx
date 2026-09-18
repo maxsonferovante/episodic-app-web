@@ -70,11 +70,12 @@ export function ProfileDialog({
           <Dialog.Content
             w="full"
             maxW="sm"
-            rounded="2xl"
+            rounded="xl"
             p={6}
+            bg="bg"
             shadow="modal"
-            borderWidth="1px"
-            borderColor="border.subtle"
+            borderWidth="3px"
+            borderColor="border"
           >
             <Stack align="center" textAlign="center" gap={4}>
               <Dialog.Title srOnly>User profile</Dialog.Title>
@@ -84,7 +85,7 @@ export function ProfileDialog({
 
               {/* Avatar */}
               <Box position="relative">
-                <Avatar.Root size="2xl" borderWidth="2px" borderColor="border.subtle" shadow="xs">
+                <Avatar.Root size="2xl" borderWidth="2.5px" borderColor="border" shadow="sm">
                   <Avatar.Image src={user?.avatarUrl ?? undefined} alt={user?.name ?? ""} />
                   <Avatar.Fallback name={user?.name} bg="bg.muted" fontWeight="bold">
                     {initials}
@@ -121,9 +122,9 @@ export function ProfileDialog({
               <Flex
                 w="full"
                 bg="bg.subtle"
-                borderWidth="1px"
-                borderColor="border.subtle"
-                rounded="xl"
+                borderWidth="2.5px"
+                borderColor="border"
+                rounded="lg"
                 p={4}
                 align="center"
                 justify="space-between"
@@ -155,9 +156,9 @@ export function ProfileDialog({
                   <Button
                     w="full"
                     colorPalette="gray"
-                    rounded="full"
+                    rounded="md"
                     h={11}
-                    fontWeight="semibold"
+                    fontWeight="bold"
                     fontSize="sm"
                     onClick={() => {
                       onOpenChange(false)
@@ -171,8 +172,7 @@ export function ProfileDialog({
                 <Button
                   w="full"
                   variant="outline"
-                  rounded="full"
-                  borderColor="border.subtle"
+                  rounded="md"
                   onClick={() => onOpenChange(false)}
                 >
                   Close

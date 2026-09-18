@@ -50,13 +50,14 @@ export function ConfirmDialog({
           p={4}
         >
           <Dialog.Content
-            rounded="2xl"
+            rounded="xl"
             maxW="md"
             w="full"
             p={6}
+            bg="bg"
             shadow="modal"
-            borderWidth="1px"
-            borderColor="border.subtle"
+            borderWidth="3px"
+            borderColor="border"
           >
             <VStack gap={3} textAlign="center">
               <Flex
@@ -81,7 +82,7 @@ export function ConfirmDialog({
 
               <Flex gap={3} w="full" pt={2}>
                 <Dialog.ActionTrigger asChild>
-                  <Button variant="outline" flex={1} rounded="full" borderColor="border.subtle">
+                  <Button variant="outline" flex={1} rounded="md">
                     Cancel
                   </Button>
                 </Dialog.ActionTrigger>
@@ -89,8 +90,8 @@ export function ConfirmDialog({
                   colorPalette={colorPalette as "red"}
                   onClick={onConfirm}
                   flex={1}
-                  rounded="full"
-                  fontWeight="semibold"
+                  rounded="md"
+                  fontWeight="bold"
                 >
                   {confirmLabel}
                 </Button>

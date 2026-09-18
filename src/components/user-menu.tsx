@@ -67,12 +67,12 @@ export function UserMenu({ onOpenProfile }: UserMenuProps) {
       <Portal>
         <Menu.Positioner>
           <Menu.Content
-            rounded="2xl"
+            rounded="xl"
             w={60}
             p={1.5}
             shadow="menu"
-            borderWidth="1px"
-            borderColor="border.subtle"
+            borderWidth="2.5px"
+            borderColor="border"
             bg="bg.panel"
           >
           {/* Header */}
