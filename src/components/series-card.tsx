@@ -49,14 +49,18 @@ export function SeriesCard({
 
   const cardContent = (
     <Box
-      rounded="2xl"
-      borderWidth="1px"
-      borderColor="border.subtle"
+      rounded="xl"
+      borderWidth="2.5px"
+      borderColor="border"
       bg="bg"
       overflow="hidden"
       position="relative"
-      _hover={{ shadow: "md", borderColor: "border.emphasized" }}
-      transition="all"
+      boxShadow="3px 3px 0 0 var(--chakra-colors-border)"
+      _hover={{
+        boxShadow: "4px 4px 0 0 var(--chakra-colors-border)",
+        transform: "translate(-1px, -1px)",
+      }}
+      transition="transform 120ms ease, box-shadow 120ms ease"
       display="flex"
       flexDirection="column"
     >

@@ -172,10 +172,10 @@ export default function DashboardPage() {
               gap={6}
               bg="bg"
               p={{ base: 6, md: 8 }}
-              rounded="3xl"
-              borderWidth="1px"
-              borderColor="border.subtle"
-              shadow="xs"
+              rounded="xl"
+              borderWidth="2.5px"
+              borderColor="border"
+              boxShadow="3px 3px 0 0 var(--chakra-colors-border)"
             >
               <Box>
                 <Heading size="2xl" letterSpacing="tight">
@@ -229,14 +229,18 @@ export default function DashboardPage() {
                       style={{ textDecoration: "none" }}
                     >
                       <Box
-                        rounded="2xl"
+                        rounded="xl"
                         overflow="hidden"
-                        borderWidth="1px"
-                        borderColor="border.subtle"
+                        borderWidth="2.5px"
+                        borderColor="border"
                         bg="bg"
                         position="relative"
-                        _hover={{ shadow: "md" }}
-                        transition="all"
+                        boxShadow="3px 3px 0 0 var(--chakra-colors-border)"
+                        _hover={{
+                          boxShadow: "4px 4px 0 0 var(--chakra-colors-border)",
+                          transform: "translate(-1px, -1px)",
+                        }}
+                        transition="transform 120ms ease, box-shadow 120ms ease"
                       >
                         {/* Top accent bar */}
                         <Box h={1} w="full" bg="accent" />
@@ -352,17 +356,21 @@ export default function DashboardPage() {
                           <Box
                             key={`${item.series.id}-${item.episode.seasonNumber}-${item.episode.episodeNumber}`}
                             p={4}
-                            rounded="2xl"
-                            borderWidth="1px"
-                            borderColor="border.subtle"
+                            rounded="xl"
+                            borderWidth="2.5px"
+                            borderColor="border"
                             bg="bg"
                             position="relative"
                             overflow="hidden"
                             display="flex"
                             alignItems="center"
                             gap={4}
-                            _hover={{ shadow: "sm" }}
-                            transition="all"
+                            boxShadow="2px 2px 0 0 var(--chakra-colors-border)"
+                            _hover={{
+                              boxShadow: "3px 3px 0 0 var(--chakra-colors-border)",
+                              transform: "translate(-1px, -1px)",
+                            }}
+                            transition="transform 120ms ease, box-shadow 120ms ease"
                             cursor="pointer"
                             onClick={() =>
                               router.push(

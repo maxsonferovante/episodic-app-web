@@ -167,7 +167,14 @@ function LibraryContent() {
               position={{ lg: "sticky" }}
               top={{ lg: "96px" }}
             >
-              <Box borderWidth="1px" borderColor="border.subtle" rounded="2xl" bg="bg" p={4}>
+              <Box
+                borderWidth="2.5px"
+                borderColor="border"
+                rounded="xl"
+                bg="bg"
+                boxShadow="3px 3px 0 0 var(--chakra-colors-border)"
+                p={4}
+              >
                 <Stack gap={3}>
                   <Text fontSize="sm" fontWeight="semibold" color="fg">
                     Status

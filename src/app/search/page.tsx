@@ -149,7 +149,7 @@ export default function SearchPage() {
           ) : recentHistory.length > 0 ? (
             <Box>
               <Flex align="center" gap={2} mb={4}>
-                <Box w={1.5} h={3} bg="fg.muted" rounded="full" opacity={0.4} />
+                <Box w={1.5} h={3} bg="accent" rounded="full" />
                 <Heading size="sm" textTransform="uppercase" letterSpacing="wider" color="fg.muted">
                   Recent History ({recentHistory.length})
                 </Heading>
@@ -159,15 +159,19 @@ export default function SearchPage() {
                   <Box
                     key={i}
                     p={4}
-                    rounded="2xl"
-                    borderWidth="1px"
-                    borderColor="border.subtle"
+                    rounded="xl"
+                    borderWidth="2.5px"
+                    borderColor="border"
                     bg="bg"
                     display="flex"
                     alignItems="center"
                     gap={4}
-                    _hover={{ shadow: "sm" }}
-                    transition="all"
+                    boxShadow="2px 2px 0 0 var(--chakra-colors-border)"
+                    _hover={{
+                      boxShadow: "3px 3px 0 0 var(--chakra-colors-border)",
+                      transform: "translate(-1px, -1px)",
+                    }}
+                    transition="transform 120ms ease, box-shadow 120ms ease"
                     cursor="pointer"
                     onClick={() =>
                       router.push(

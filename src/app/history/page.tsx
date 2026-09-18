@@ -115,15 +115,20 @@ export default function HistoryPage() {
                   <Box
                     key={`${item.episode.id}-${i}`}
                     p={4}
-                    rounded="lg"
-                    borderWidth="1px"
-                    borderColor="border.subtle"
+                    rounded="xl"
+                    borderWidth="2.5px"
+                    borderColor="border"
+                    bg="bg"
                     display="flex"
                     alignItems="center"
                     gap={4}
                     cursor="pointer"
-                    _hover={{ shadow: "sm" }}
-                    transition="all"
+                    boxShadow="2px 2px 0 0 var(--chakra-colors-border)"
+                    _hover={{
+                      boxShadow: "3px 3px 0 0 var(--chakra-colors-border)",
+                      transform: "translate(-1px, -1px)",
+                    }}
+                    transition="transform 120ms ease, box-shadow 120ms ease"
                     onClick={() =>
                       router.push(
                         `/series/${item.series.id}/episodes/${item.episode.seasonNumber}-${item.episode.episodeNumber}`,

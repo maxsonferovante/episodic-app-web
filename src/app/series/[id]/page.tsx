@@ -219,7 +219,14 @@ export default function SeriesDetailPage() {
         <Container maxW="6xl" py={8} px={{ base: 4, md: 6 }}>
           <Stack gap={8}>
             {/* Banner + Poster */}
-            <Box position="relative" rounded="2xl" overflow="hidden">
+            <Box
+              position="relative"
+              rounded="xl"
+              overflow="hidden"
+              borderWidth="3px"
+              borderColor="border"
+              boxShadow="5px 5px 0 0 var(--chakra-colors-border)"
+            >
               {series.backdropPath ? (
                 <Image
                   src={`${IMG_ORIGINAL}${series.backdropPath}`}
@@ -277,7 +284,14 @@ export default function SeriesDetailPage() {
             </Box>
 
             {/* Overall Progress */}
-            <Box p={5} rounded="2xl" borderWidth="1px" borderColor="border.subtle" bg="bg" shadow="sm">
+            <Box
+              p={5}
+              rounded="xl"
+              borderWidth="2.5px"
+              borderColor="border"
+              bg="bg"
+              boxShadow="3px 3px 0 0 var(--chakra-colors-border)"
+            >
               <Stack gap={3}>
                 <Flex justifyContent="space-between" alignItems="center">
                   <Flex gap={2} alignItems="center">
@@ -325,7 +339,7 @@ export default function SeriesDetailPage() {
                 </Heading>
                 <Flex gap={3} flexWrap="wrap">
                   {series.providers.slice(0, 6).map((p) => (
-                    <Flex key={p.providerId} gap={2} align="center" px={3} py={2} rounded="lg" borderWidth="1px" borderColor="border.subtle">
+                    <Flex key={p.providerId} gap={2} align="center" px={3} py={2} rounded="md" borderWidth="2.5px" borderColor="border" bg="bg" boxShadow="2px 2px 0 0 var(--chakra-colors-border)">
                       {p.logoPath && <Image src={`${IMG_BASE}${p.logoPath}`} alt={p.providerName} boxSize={5} rounded="sm" objectFit="contain" />}
                       <Text fontSize="xs">{p.providerName}</Text>
                     </Flex>
@@ -345,9 +359,9 @@ export default function SeriesDetailPage() {
                   gap={1}
                   p={1.5}
                   bg="bg.muted"
-                  rounded="full"
-                  borderWidth="1px"
-                  borderColor="border.subtle"
+                  rounded="lg"
+                  borderWidth="3px"
+                  borderColor="border"
                   overflowX="auto"
                   css={{ scrollbarWidth: "none", "&::-webkit-scrollbar": { display: "none" } }}
                 >
@@ -444,11 +458,15 @@ export default function SeriesDetailPage() {
                             key={ep.id}
                             p={3}
                             rounded="lg"
-                            borderWidth="1px"
-                            borderColor={isWatched ? "green.200" : "border.subtle"}
+                            borderWidth="2.5px"
+                            borderColor="border"
                             bg={isWatched ? "green.50" : "bg"}
-                            _hover={{ shadow: "sm" }}
-                            transition="all"
+                            boxShadow="2px 2px 0 0 var(--chakra-colors-border)"
+                            _hover={{
+                              boxShadow: "3px 3px 0 0 var(--chakra-colors-border)",
+                              transform: "translate(-1px, -1px)",
+                            }}
+                            transition="transform 120ms ease, box-shadow 120ms ease"
                             cursor="pointer"
                             display="flex"
                             alignItems="center"
@@ -463,6 +481,8 @@ export default function SeriesDetailPage() {
                               rounded="lg"
                               bg={isWatched ? "green.500" : "bg.muted"}
                               color={isWatched ? "white" : "fg.muted"}
+                              borderWidth="2px"
+                              borderColor="border"
                               fontWeight="bold"
                               fontSize="sm"
                               flexShrink={0}

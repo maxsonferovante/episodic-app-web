@@ -178,7 +178,14 @@ export default function EpisodeDetailPage() {
             </Button>
 
             {/* Episode Banner */}
-            <Box position="relative" rounded="2xl" overflow="hidden">
+            <Box
+              position="relative"
+              rounded="xl"
+              overflow="hidden"
+              borderWidth="3px"
+              borderColor="border"
+              boxShadow="5px 5px 0 0 var(--chakra-colors-border)"
+            >
               {episode.stillPath ? (
                 <Image
                   src={`${IMG_ORIGINAL}${episode.stillPath}`}
@@ -234,7 +241,14 @@ export default function EpisodeDetailPage() {
             </Box>
 
             {/* Watched Status Card */}
-            <Box p={5} rounded="2xl" borderWidth="1px" borderColor={isWatched ? "green.200" : "border.subtle"} bg={isWatched ? "green.50" : "bg"} shadow="sm">
+            <Box
+              p={5}
+              rounded="xl"
+              borderWidth="2.5px"
+              borderColor="border"
+              bg={isWatched ? "green.50" : "bg"}
+              boxShadow="3px 3px 0 0 var(--chakra-colors-border)"
+            >
               <Stack gap={3}>
                 <Flex justifyContent="space-between" alignItems="center">
                   <Flex gap={2} alignItems="center">
