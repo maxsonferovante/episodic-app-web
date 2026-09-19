@@ -7,7 +7,6 @@ import type {
   Episode,
   LibraryResponse,
   LibraryItem,
-  DashboardResponse,
   HistoryResponse,
   ProgressResponse,
   CalendarResponse,
@@ -320,10 +319,6 @@ export async function removeFromLibrary(
   seriesId: string,
 ): Promise<void> {
   return request(`/api/v1/library/${seriesId}`, { method: "DELETE" })
-}
-
-export async function getDashboard(): Promise<DashboardResponse> {
-  return request("/api/v1/dashboard")
 }
 
 export async function getHistory(

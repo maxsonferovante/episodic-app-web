@@ -23,8 +23,8 @@ import {
 } from "@chakra-ui/react"
 import { FiPlus, FiSearch, FiChevronRight } from "react-icons/fi"
 import { ProtectedLayout } from "@/components/protected-layout"
-import { getDashboard, getReleases } from "@/lib/api"
-import type { DashboardResponse, UpcomingItem } from "@/lib/types"
+import { getReleases } from "@/lib/api"
+import type { UpcomingItem } from "@/lib/types"
 
 const IMG_BASE = "https://image.tmdb.org/t/p/w500"
 
@@ -64,9 +64,6 @@ function shortDate(airDate: string): string {
 
 export default function DashboardPage() {
   const router = useRouter()
-  const [data, setData] = useState<DashboardResponse | null>(null)
-  const [loading, setLoading] = useState(true)
-  const [error, setError] = useState<string | null>(null)
 
   // Releases view mode (library series only). The backend serves any
   // [from, to) window; the modes below just pick the bounds.
@@ -78,13 +75,6 @@ export default function DashboardPage() {
   const [releases, setReleases] = useState<UpcomingItem[] | null>(null)
   const [releasesLoading, setReleasesLoading] = useState(true)
   const [releasesError, setReleasesError] = useState(false)
-
-  useEffect(() => {
-    getDashboard()
-      .then(setData)
-      .catch(() => setError("Failed to load dashboard"))
-      .finally(() => setLoading(false))
-  }, [])
 
   useEffect(() => {
     const now = new Date()
@@ -154,16 +144,7 @@ export default function DashboardPage() {
   return (
     <ProtectedLayout>
       <Container maxW="7xl" py={8} px={{ base: 4, md: 6 }}>
-        {loading ? (
-          <Center py={20}>
-            <Spinner size="lg" />
-          </Center>
-        ) : error ? (
-          <Center py={20}>
-            <Text color="fg.muted">{error}</Text>
-          </Center>
-        ) : (
-          <Stack gap={10}>
+        <Stack gap={10}>
             {/* Greeting + Action Buttons */}
             <Flex
               direction={{ base: "column", md: "row" }}
@@ -211,77 +192,6 @@ export default function DashboardPage() {
                 </Button>
               </Flex>
             </Flex>
-
-            {/* Continue Watching */}
-            {data?.continueWatching && data.continueWatching.length > 0 && (
-              <Box>
-                <Flex align="center" gap={2} mb={4}>
-                  <Box w={1.5} h={3} bg="accent" rounded="full" />
-                  <Heading size="sm" textTransform="uppercase" letterSpacing="wider" color="fg.muted">
-                    Continue Watching ({data.continueWatching.length})
-                  </Heading>
-                </Flex>
-                <SimpleGrid columns={{ base: 1, sm: 2, md: 3, lg: 4 }} gap={4}>
-                  {data.continueWatching.map((item) => (
-                    <Link
-                      key={item.series.id}
-                      href={`/series/${item.series.id}`}
-                      style={{ textDecoration: "none" }}
-                    >
-                      <Box
-                        rounded="xl"
-                        overflow="hidden"
-                        borderWidth="2.5px"
-                        borderColor="border"
-                        bg="bg"
-                        position="relative"
-                        boxShadow="3px 3px 0 0 var(--chakra-colors-border)"
-                        _hover={{
-                          boxShadow: "4px 4px 0 0 var(--chakra-colors-border)",
-                          transform: "translate(-1px, -1px)",
-                        }}
-                        transition="transform 120ms ease, box-shadow 120ms ease"
-                      >
-                        {/* Top accent bar */}
-                        <Box h={1} w="full" bg="accent" />
-
-                        {item.series.posterPath && (
-                          <Image
-                            src={`${IMG_BASE}${item.series.posterPath}`}
-                            alt={item.series.name}
-                            w="full"
-                            h={64}
-                            objectFit="cover"
-                          />
-                        )}
-
-                        {/* Gradient divider */}
-                        <Box h="2px" w="full" bg="accent.subtle" />
-
-                        <Box p={3}>
-                          <Text fontWeight="semibold" fontSize="sm" truncate>
-                            {item.series.name}
-                          </Text>
-                          <Text fontSize="xs" color="fg.muted" mt={1}>
-                            S{item.nextEpisode.seasonNumber}E{item.nextEpisode.episodeNumber}
-                          </Text>
-                          <Progress.Root
-                            value={item.progress.percentage}
-                            size="sm"
-                            mt={2}
-                            colorPalette="blue"
-                          >
-                            <Progress.Track>
-                              <Progress.Range />
-                            </Progress.Track>
-                          </Progress.Root>
-                        </Box>
-                      </Box>
-                    </Link>
-                  ))}
-                </SimpleGrid>
-              </Box>
-            )}
 
             {/* Upcoming releases (library series only) */}
             <Box>
@@ -414,8 +324,7 @@ export default function DashboardPage() {
             </Box>
 
             {/* Empty state */}
-            {!data?.continueWatching?.length &&
-              !releasesLoading &&
+            {!releasesLoading &&
               !releasesError &&
               (releases?.length ?? 0) === 0 && (
                 <Center py={20}>
@@ -439,7 +348,6 @@ export default function DashboardPage() {
                 </Center>
               )}
           </Stack>
-        )}
       </Container>
     </ProtectedLayout>
   )

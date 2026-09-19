@@ -124,17 +124,6 @@ export interface LibraryEntry {
 
 export type LibraryResponse = LibraryItem[]
 
-export interface ContinueWatchingItem {
-  series: SeriesSummary
-  nextEpisode: {
-    id: string
-    seasonNumber: number
-    episodeNumber: number
-    name: string
-  }
-  progress: { percentage: number }
-}
-
 export interface UpcomingItem {
   series: SeriesSummary
   episode: { seasonNumber: number; episodeNumber: number; name: string }
@@ -160,12 +149,6 @@ export interface HistoryItem {
   watchedAt: string
   /** What happened: MARK_WATCHED or UNMARK_WATCHED. */
   eventType: string
-}
-
-export interface DashboardResponse {
-  continueWatching: ContinueWatchingItem[]
-  upcoming: UpcomingItem[]
-  recentHistory: HistoryItem[]
 }
 
 export interface HistoryResponse {

@@ -16,7 +16,7 @@ import {
 } from "@chakra-ui/react"
 import { ProtectedLayout } from "@/components/protected-layout"
 import { SeriesCard } from "@/components/series-card"
-import { searchSeries, addToLibrary, getDashboard } from "@/lib/api"
+import { searchSeries, addToLibrary, getHistory } from "@/lib/api"
 import type { SeriesSummary, HistoryItem } from "@/lib/types"
 
 export default function SearchPage() {
@@ -30,8 +30,8 @@ export default function SearchPage() {
   const [recentHistory, setRecentHistory] = useState<HistoryItem[]>([])
 
   useEffect(() => {
-    getDashboard()
-      .then((data) => setRecentHistory(data.recentHistory ?? []))
+    getHistory(undefined, 10)
+      .then((data) => setRecentHistory(data.items ?? []))
       .catch(() => {})
   }, [])
 
