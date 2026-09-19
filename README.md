@@ -14,15 +14,18 @@ upcoming episodes.
 - Series detail with seasons/episodes, watched toggles and *mark season watched*
   (aired episodes only)
 - Episode detail with own progress and previous/next navigation
-- Dashboard with *Continue Watching* and *Upcoming* (one next episode per series)
-- Recent history shown as the search screen's empty state
+- Dashboard with *Upcoming* release views (this week, this month, next 3
+  months, or a picked month) grouped by day with weekday headers
+- Recent history shown as the search screen's empty state (fetched from
+  `/api/v1/history`)
 - Public Privacy Policy and Terms of Use
-- Light/dark theme on a Geist (Vercel-inspired) design system
+- Neo-brutalist design system (cream canvas, ink borders, hard offset shadows,
+  a single red accent) defined in `src/theme`
 
 ## Tech stack
 
 Next.js 16 (App Router, Turbopack) · React 19 · TypeScript · Chakra UI v3 with a
-custom Geist theme · `react-icons` · `@react-oauth/google` · Vercel Analytics.
+custom neo-brutalist theme · `react-icons` · `@react-oauth/google` · Vercel Analytics.
 
 ## Getting started
 
@@ -64,7 +67,7 @@ src/
   components/   app shell, cards, dialogs, google button, legal layout, ...
   contexts/     auth context
   lib/          API client, types, constants
-  theme/        Chakra Geist system (colors, tokens, shadows)
+  theme/        Chakra system: neo-brutalist tokens, recipes, hard shadows
 public/         logo (svg/png) and static assets
 ```
 
