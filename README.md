@@ -61,7 +61,7 @@ Only `NEXT_PUBLIC_*` values reach the browser. Never put backend secrets
 
 ```
 src/
-  app/          routes: dashboard, search, library, series/[id],
+  app/          routes: home, search, library, series/[id],
                 series/[id]/episodes/[episodeId], history, login,
                 privacy-policy, terms-of-use
   components/   app shell, cards, dialogs, google button, legal layout, ...
