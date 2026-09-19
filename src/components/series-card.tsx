@@ -28,7 +28,7 @@ interface SeriesCardProps {
   progress?: number
   onAdd?: () => void
   onRemove?: () => void
-  variant?: "library" | "search" | "dashboard"
+  variant?: "library" | "search" | "default"
 }
 
 export function SeriesCard({
@@ -43,7 +43,7 @@ export function SeriesCard({
   progress,
   onAdd,
   onRemove,
-  variant = "dashboard",
+  variant = "default",
 }: SeriesCardProps) {
   const statusMeta = status ? SERIES_STATUS_META[status as SeriesStatus] : undefined
 

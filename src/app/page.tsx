@@ -1,17 +1,14 @@
 "use client"
 
 import { useEffect, useState } from "react"
-import Link from "next/link"
 import { useRouter } from "next/navigation"
 import {
   Box,
   Container,
   Heading,
   Text,
-  SimpleGrid,
   Stack,
   Badge,
-  Progress,
   Spinner,
   Center,
   VStack,
@@ -62,7 +59,7 @@ function shortDate(airDate: string): string {
   return `${MONTHS[parts[1] - 1]} ${parts[2]}`
 }
 
-export default function DashboardPage() {
+export default function HomePage() {
   const router = useRouter()
 
   // Releases view mode (library series only). The backend serves any
